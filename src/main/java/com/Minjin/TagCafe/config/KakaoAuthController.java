@@ -96,13 +96,16 @@ public class KakaoAuthController {
         }
 
         Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
+
         String nickname = profile != null ? (String) profile.get("nickname") : "Unknown";
+        String encodedNickname = URLEncoder.encode(nickname, StandardCharsets.UTF_8);
+
         String email = (String) kakaoAccount.get("email");
 
         logger.info("✅ 카카오 로그인 성공! 닉네임: {}, 이메일: {}", nickname, email);
 
         // ✅ 6. 프론트엔드로 리다이렉트
-        return new RedirectView("http://localhost:3000/home?nickname=" + nickname + "&email=" + email);
+        return new RedirectView("http://localhost:3000/home?nickname=" + encodedNickname + "&email=" + email);
     }
 
     @GetMapping("/userinfo")
