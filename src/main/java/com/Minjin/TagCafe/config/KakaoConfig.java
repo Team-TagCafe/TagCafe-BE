@@ -18,4 +18,7 @@ public class KakaoConfig {
     @Value("${kakao.redirect-uri}")
     private String redirectUri;
 
+    @Value("${security.jwt.secret}")
+    private String jwtSecret;
+
 }

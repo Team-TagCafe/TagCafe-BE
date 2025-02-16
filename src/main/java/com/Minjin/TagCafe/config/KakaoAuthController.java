@@ -1,5 +1,8 @@
 package com.Minjin.TagCafe.config;
 
+import com.Minjin.TagCafe.entity.User;
+import com.Minjin.TagCafe.repository.UserRepository;
+import com.Minjin.TagCafe.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +19,7 @@ import org.springframework.web.servlet.view.RedirectView;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/oauth/kakao")
@@ -26,6 +30,8 @@ public class KakaoAuthController {
 
     private final KakaoConfig kakaoConfig;
     private final RestTemplate restTemplate = new RestTemplate();
+    private final UserRepository userRepository;
+    private final JwtUtil jwtUtil;
 
     @GetMapping("/login")
     public RedirectView kakaoLogin() {
@@ -40,7 +46,6 @@ public class KakaoAuthController {
 
     @GetMapping("/callback")
     public RedirectView kakaoCallback(@RequestParam("code") String code) {
-        logger.info("🔍 카카오 로그인 콜백 호출됨, Authorization Code: {}", code);
 
         String tokenUrl = "https://kauth.kakao.com/oauth/token";
         String userInfoUrl = "https://kapi.kakao.com/v2/user/me";
@@ -105,7 +110,23 @@ public class KakaoAuthController {
         logger.info("✅ 카카오 로그인 성공! 닉네임: {}, 이메일: {}", nickname, email);
 
         // ✅ 6. 프론트엔드로 리다이렉트
-        return new RedirectView("http://localhost:3000/home?nickname=" + encodedNickname + "&email=" + email);
+        // ✅ 6. DB에서 사용자 확인 및 저장
+        Optional<User> existingUser = userRepository.findByEmail(email);
+        User user;
+        if (existingUser.isPresent()) {
+            user = existingUser.get();
+        } else {
+            user = new User(nickname, email);
+            userRepository.save(user);
+        }
+
+        // ✅ 7. JWT 발급
+        String jwtToken = jwtUtil.generateToken(user.getEmail());
+
+        // ✅ 8. 프론트엔드로 리다이렉트 (JWT 포함)
+        return new RedirectView("http://localhost:3000/home?nickname=" + URLEncoder.encode(nickname, StandardCharsets.UTF_8)
+                + "&email=" + email
+                + "&token=" + jwtToken);
     }
 
     @GetMapping("/userinfo")
