@@ -109,7 +109,6 @@ public class KakaoAuthController {
 
         logger.info("✅ 카카오 로그인 성공! 닉네임: {}, 이메일: {}", nickname, email);
 
-        // ✅ 6. 프론트엔드로 리다이렉트
         // ✅ 6. DB에서 사용자 확인 및 저장
         Optional<User> existingUser = userRepository.findByEmail(email);
         User user;

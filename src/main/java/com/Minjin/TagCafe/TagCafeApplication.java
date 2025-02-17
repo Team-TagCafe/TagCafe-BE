@@ -12,7 +12,7 @@ public class TagCafeApplication {
 
 		System.setProperty("KAKAO_CLIENT_ID", dotenv.get("KAKAO_CLIENT_ID"));
 		System.setProperty("KAKAO_REDIRECT_URI", dotenv.get("KAKAO_REDIRECT_URI"));
-		System.setProperty("JWT_SECRET_KEY", dotenv.get("JWT_SECRET_KEY"));
+		System.setProperty("SECURITY_JWT_SECRET", dotenv.get("SECURITY_JWT_SECRET"));
 		SpringApplication.run(TagCafeApplication.class, args);
 	}
 
