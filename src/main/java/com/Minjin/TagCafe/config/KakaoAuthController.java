@@ -45,7 +45,7 @@ public class KakaoAuthController {
     }
 
     @GetMapping("/callback")
-    public RedirectView kakaoCallback(@RequestParam("code") String code) {
+    public RedirectView kakaoCallback(@RequestParam(name="code") String code) {
 
         String tokenUrl = "https://kauth.kakao.com/oauth/token";
         String userInfoUrl = "https://kapi.kakao.com/v2/user/me";
@@ -114,6 +114,11 @@ public class KakaoAuthController {
         User user;
         if (existingUser.isPresent()) {
             user = existingUser.get();
+
+            if (!user.getNickname().equals(nickname)) {
+                user.setNickname(nickname);
+                userRepository.save(user);
+            }
         } else {
             user = new User(nickname, email);
             userRepository.save(user);
@@ -140,4 +145,5 @@ public class KakaoAuthController {
 
         return ResponseEntity.ok("카카오 사용자 정보: " + response.getBody());
     }
+
 }
