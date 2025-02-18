@@ -57,28 +57,22 @@ public class KakaoAuthController {
         // 2. 요청 Body 설정
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
-        params.add("client_id", kakaoConfig.getClientId()); // ✅ 수정
-        params.add("redirect_uri", kakaoConfig.getRedirectUri()); // ✅ 수정
+        params.add("client_id", kakaoConfig.getClientId());
+        params.add("redirect_uri", kakaoConfig.getRedirectUri());
         params.add("code", code);
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
-
         ResponseEntity<Map> tokenResponse = restTemplate.exchange(tokenUrl, HttpMethod.POST, request, Map.class);
 
         if (tokenResponse.getBody() == null) {
-            logger.error("❌ 카카오 토큰 응답이 없습니다.");
             return new RedirectView("http://localhost:3000/error?message=카카오 토큰 발급 실패");
         }
 
-        Map<String, Object> tokenMap = tokenResponse.getBody();
-        String accessToken = (String) tokenMap.get("access_token");
+        String accessToken = (String) tokenResponse.getBody().get("access_token");
 
         if (accessToken == null) {
-            logger.error("❌ 액세스 토큰이 없습니다. 응답: {}", tokenResponse.getBody());
             return new RedirectView("http://localhost:3000/error?message=액세스 토큰 발급 실패");
         }
-
-        logger.info("✅ 카카오 액세스 토큰 발급 완료: {}", accessToken);
 
         // ✅ 4. 사용자 정보 요청
         headers = new HttpHeaders();
@@ -88,47 +82,39 @@ public class KakaoAuthController {
         ResponseEntity<Map> userInfoResponse = restTemplate.exchange(userInfoUrl, HttpMethod.GET, entity, Map.class);
 
         if (userInfoResponse.getBody() == null) {
-            logger.error("❌ 카카오 사용자 정보 응답이 없습니다.");
             return new RedirectView("http://localhost:3000/error?message=카카오 사용자 정보 가져오기 실패");
         }
 
-        // ✅ 5. 사용자 정보 추출
-        Map<String, Object> userInfo = userInfoResponse.getBody();
-        Map<String, Object> kakaoAccount = (Map<String, Object>) userInfo.get("kakao_account");
-
-        if (kakaoAccount == null) {
-            return new RedirectView("http://localhost:3000/error?message=카카오 계정 정보 없음");
-        }
-
+        Map<String, Object> kakaoAccount = (Map<String, Object>) userInfoResponse.getBody().get("kakao_account");
         Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
 
-        String nickname = profile != null ? (String) profile.get("nickname") : "Unknown";
-        String encodedNickname = URLEncoder.encode(nickname, StandardCharsets.UTF_8);
-
+        String kakaoNickname = profile != null ? (String) profile.get("nickname") : "Unknown";
         String email = (String) kakaoAccount.get("email");
 
-        logger.info("✅ 카카오 로그인 성공! 닉네임: {}, 이메일: {}", nickname, email);
+        logger.info("✅ 카카오 로그인 성공! 닉네임: {}, 이메일: {}", kakaoNickname, email);
 
         // ✅ 6. DB에서 사용자 확인 및 저장
         Optional<User> existingUser = userRepository.findByEmail(email);
         User user;
+
         if (existingUser.isPresent()) {
             user = existingUser.get();
 
-            if (!user.getNickname().equals(nickname)) {
-                user.setNickname(nickname);
-                userRepository.save(user);
-            }
+            // ✅ DB에 저장된 최신 닉네임을 사용
+            String storedNickname = user.getNickname();
+            logger.info("🔄 로그인 닉네임 설정: DB닉네임={}, 카카오닉네임={}", storedNickname, kakaoNickname);
         } else {
-            user = new User(nickname, email);
+            // 신규 유저라면 카카오 닉네임을 저장
+            user = new User(kakaoNickname, email);
             userRepository.save(user);
+            logger.info("🆕 신규 사용자 등록: {}", email);
         }
 
         // ✅ 7. JWT 발급
         String jwtToken = jwtUtil.generateToken(user.getEmail());
 
-        // ✅ 8. 프론트엔드로 리다이렉트 (JWT 포함)
-        return new RedirectView("http://localhost:3000/home?nickname=" + URLEncoder.encode(nickname, StandardCharsets.UTF_8)
+        // ✅ 8. 프론트엔드로 리다이렉트 (닉네임은 DB에서 가져온 최신값)
+        return new RedirectView("http://localhost:3000/home?nickname=" + URLEncoder.encode(user.getNickname(), StandardCharsets.UTF_8)
                 + "&email=" + email
                 + "&token=" + jwtToken);
     }
