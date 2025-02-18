@@ -32,4 +32,16 @@ public class UserController {
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("사용자를 찾을 수 없습니다");
     }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> deleteUser(@RequestParam("email") String email) {
+        Optional<User> userOptional = userRepository.findByEmail(email);
+
+        if (userOptional.isPresent()) {
+            userRepository.delete(userOptional.get());
+            return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
+        }
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("사용자를 찾을 수 없습니다.");
+    }
 }

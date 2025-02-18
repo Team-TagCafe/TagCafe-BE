@@ -24,6 +24,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // CSRF 비활성화
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.PUT, "/users/nickname").permitAll()  // ✅ PUT 요청 허용
+                        .requestMatchers(HttpMethod.DELETE, "/users/delete").permitAll()
                         .requestMatchers("/oauth/kakao/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // ✅ Preflight 요청 허용
                         .anyRequest().authenticated()
