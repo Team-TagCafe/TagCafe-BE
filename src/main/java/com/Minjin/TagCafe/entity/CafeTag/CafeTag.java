@@ -2,11 +2,10 @@ package com.Minjin.TagCafe.entity.CafeTag;
 
 import com.Minjin.TagCafe.entity.Cafe.Cafe;
 import com.Minjin.TagCafe.entity.Tag.Tag;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Table(name = "CafeTag")
@@ -14,13 +13,15 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class CafeTag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int cafeTagID;
 
     @ManyToOne
-    @JoinColumn(name = "cafeID", nullable = false)
+    @JoinColumn(name = "cafeId", nullable = false)
+    @JsonIgnore
     private Cafe cafe;
 
     @ManyToOne
@@ -28,5 +29,5 @@ public class CafeTag {
     private Tag tag;
 
     @Column(nullable = false)
-    private String value;
+    private String value; // 태그 값 (예: "빠름", "일부", "없음")
 }
