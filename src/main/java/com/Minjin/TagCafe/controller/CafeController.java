@@ -23,15 +23,8 @@ public class CafeController {
 
     // 검색
     @GetMapping("/search")
-    public ResponseEntity<List<Cafe>> searchCafeByName(@RequestParam(name = "name", required = false) String name,
-                                                       @RequestParam(name = "address", required = false) String address) {
-        if (name != null) {
-            return ResponseEntity.ok(cafeService.searchCafeByName(name));
-        } else if (address != null) {
-            return ResponseEntity.ok(cafeService.searchCafeByAddress(address));
-        } else {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<List<Cafe>> searchCafe(@RequestParam(name = "query") String query) {
+        return ResponseEntity.ok(cafeService.searchCafeByKeyword(query));
     }
 
     // 지도 영역 내 카페 조회 (위경도 범위 내 검색)
