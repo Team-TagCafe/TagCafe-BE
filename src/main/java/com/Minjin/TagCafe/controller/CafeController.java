@@ -11,13 +11,14 @@ import java.util.List;
 @RestController
 @RequestMapping("/cafes")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "https://localhost:3000") // React에서 API 호출 허용
 public class CafeController {
     private final CafeService cafeService;
 
     // id로 카페 조회
-    @GetMapping("/{id}")
-    public ResponseEntity<Cafe> getCafeById(@PathVariable("id") Long id) {
-        Cafe cafe = cafeService.getCafeById(id);
+    @GetMapping("/{cafeId}")
+    public ResponseEntity<Cafe> getCafeById(@PathVariable("cafeId") Long cafeId) {
+        Cafe cafe = cafeService.getCafeById(cafeId);
         return ResponseEntity.ok(cafe);
     }
 
