@@ -2,11 +2,16 @@ package com.Minjin.TagCafe.service;
 
 import com.Minjin.TagCafe.entity.Cafe.Cafe;
 import com.Minjin.TagCafe.entity.Cafe.CafeRepository;
+import com.Minjin.TagCafe.entity.CafeTag.CafeTag;
+import com.Minjin.TagCafe.entity.CafeTag.CafeTagRepository;
+import com.Minjin.TagCafe.entity.Tag.Tag;
+import com.Minjin.TagCafe.entity.Tag.TagRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.Minjin.TagCafe.dto.CafeDto;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -14,22 +19,14 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class CafeService {
     private final CafeRepository cafeRepository;
+    private final CafeTagRepository cafeTagRepository;
+    private final TagRepository tagRepository;
 
     // ID로 카페 조회
     public Cafe getCafeById(Long cafeId) {
         return cafeRepository.findById(cafeId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 카페를 찾을 수 없습니다."));
 
-    }
-
-    // 카페 이름으로 카페 조회
-    public List<Cafe> searchCafeByName(String name) {
-        return cafeRepository.findByCafeNameContainingIgnoreCase(name);
-    }
-
-    // 주소로 카페 조회
-    public List<Cafe> searchCafeByAddress(String address) {
-        return cafeRepository.findByAddressContainingIgnoreCase(address);
     }
 
     // 하나의 키워드로 카페 조회 (카페 이름, 주소 구분 X)
@@ -41,6 +38,14 @@ public class CafeService {
         return Stream.concat(nameMatches.stream(), addressMatches.stream())
                 .distinct()
                 .collect(Collectors.toList());
+    }
+
+    // 특정 태그와 특정 값을 가진 카페 조회
+    public List<Cafe> getCafesByTagAndValue(String tagName, String value) {
+        Tag tag = tagRepository.findByTagName(tagName)
+                .orElseThrow(() -> new IllegalArgumentException("해당 태그가 존재하지 않습니다: " + tagName));
+        List<CafeTag> cafeTags = cafeTagRepository.findByTagAndValue(tag, value);
+        return cafeTags.stream().map(CafeTag::getCafe).collect(Collectors.toList());
     }
 
     // 지도 영역 내 카페 조회

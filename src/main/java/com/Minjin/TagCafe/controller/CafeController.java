@@ -39,6 +39,14 @@ public class CafeController {
         return ResponseEntity.ok(cafes);
     }
 
+    // 특정 태그와 특정 값을 가진 카페 조회
+    @GetMapping("/filter")
+    public ResponseEntity<List<Cafe>> getCafesByTagAndValue(@RequestParam(name = "tagName") String tagName,
+                                                            @RequestParam(name = "value") String value) {
+        List<Cafe> cafes = cafeService.getCafesByTagAndValue(tagName, value);
+        return ResponseEntity.ok(cafes);
+    }
+
     // admin - 카페 검색 후 db 저장
     @PostMapping
     public ResponseEntity<?> addCafe(@RequestBody CafeDto cafeDto) {
