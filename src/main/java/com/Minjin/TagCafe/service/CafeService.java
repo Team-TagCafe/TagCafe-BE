@@ -4,6 +4,7 @@ import com.Minjin.TagCafe.entity.Cafe.Cafe;
 import com.Minjin.TagCafe.entity.Cafe.CafeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import com.Minjin.TagCafe.dto.CafeDto;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -45,5 +46,24 @@ public class CafeService {
     // 지도 영역 내 카페 조회
     public List<Cafe> getCafesInArea(double minLat, double maxLat, double minLng, double maxLng) {
         return cafeRepository.findByLatitudeBetweenAndLongitudeBetween(minLat, maxLat, minLng, maxLng);
+    }
+
+    // admin - 카페 추가
+    public Cafe addCafe(CafeDto cafeDto) {
+        if (cafeRepository.findByKakaoPlaceId(cafeDto.getKakaoPlaceId()).isPresent()) {
+            throw new RuntimeException("이미 존재하는 카페입니다.");
+        }
+
+        Cafe cafe = new Cafe(
+                cafeDto.getKakaoPlaceId(),
+                cafeDto.getCafeName(),
+                cafeDto.getLatitude(),
+                cafeDto.getLongitude(),
+                cafeDto.getAddress(),
+                cafeDto.getPhoneNumber(),
+                cafeDto.getWebsiteUrl()
+        );
+
+        return cafeRepository.save(cafe);
     }
 }

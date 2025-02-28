@@ -1,5 +1,6 @@
 package com.Minjin.TagCafe.controller;
 
+import com.Minjin.TagCafe.dto.CafeDto;
 import com.Minjin.TagCafe.entity.Cafe.Cafe;
 import com.Minjin.TagCafe.service.CafeService;
 import lombok.RequiredArgsConstructor;
@@ -37,5 +38,13 @@ public class CafeController {
         List<Cafe> cafes = cafeService.getCafesInArea(minLat, maxLat, minLng, maxLng);
         return ResponseEntity.ok(cafes);
     }
+
+    // admin - 카페 검색 후 db 저장
+    @PostMapping
+    public ResponseEntity<?> addCafe(@RequestBody CafeDto cafeDto) {
+        Cafe savedCafe = cafeService.addCafe(cafeDto);
+        return ResponseEntity.ok(savedCafe);
+    }
+
 }
 
