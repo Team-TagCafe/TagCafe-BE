@@ -40,12 +40,17 @@ public class CafeController {
     }
 
     // 특정 태그와 특정 값을 가진 카페 조회
-    @GetMapping("/filter")
-    public ResponseEntity<List<Cafe>> getCafesByTagAndValue(@RequestParam(name = "tagName") String tagName,
-                                                            @RequestParam(name = "value") String value) {
-        List<Cafe> cafes = cafeService.getCafesByTagAndValue(tagName, value);
+    @GetMapping("/filter/multiple")
+    public ResponseEntity<List<Cafe>> getCafesByMultipleTags(@RequestParam(name = "tagNames") List<String> tagNames,
+                                                             @RequestParam(name = "values") List<String> values) {
+        if (tagNames.size() != values.size()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        List<Cafe> cafes = cafeService.getCafesByMultipleTagsAndValues(tagNames, values);
         return ResponseEntity.ok(cafes);
     }
+
 
     // admin - 카페 검색 후 db 저장
     @PostMapping
