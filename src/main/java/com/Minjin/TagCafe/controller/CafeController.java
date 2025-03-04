@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -45,6 +46,17 @@ public class CafeController {
                                                              @RequestParam(name = "values") List<String> values) {
         if (tagNames.size() != values.size()) {
             return ResponseEntity.badRequest().build();
+        }
+
+        // null 값 또는 빈 문자열이 포함된 필터 제거
+        List<String> validTagNames = new ArrayList<>();
+        List<String> validValues = new ArrayList<>();
+
+        for (int i = 0; i < tagNames.size(); i++) {
+            if (values.get(i) != null && !values.get(i).isEmpty()) {
+                validTagNames.add(tagNames.get(i));
+                validValues.add(values.get(i));
+            }
         }
 
         List<Cafe> cafes = cafeService.getCafesByMultipleTagsAndValues(tagNames, values);
