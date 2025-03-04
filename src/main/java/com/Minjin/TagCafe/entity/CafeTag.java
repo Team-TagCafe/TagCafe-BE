@@ -1,8 +1,5 @@
-package com.Minjin.TagCafe.entity.CafeTag;
+package com.Minjin.TagCafe.entity;
 
-import com.Minjin.TagCafe.entity.Cafe.Cafe;
-import com.Minjin.TagCafe.entity.Tag.Tag;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;

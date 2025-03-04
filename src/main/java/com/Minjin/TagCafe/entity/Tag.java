@@ -1,4 +1,4 @@
-package com.Minjin.TagCafe.entity.Tag;
+package com.Minjin.TagCafe.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

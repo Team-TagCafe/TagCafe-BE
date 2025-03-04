@@ -1,17 +1,16 @@
 package com.Minjin.TagCafe.service;
 
-import com.Minjin.TagCafe.entity.Cafe.Cafe;
-import com.Minjin.TagCafe.entity.Cafe.CafeRepository;
-import com.Minjin.TagCafe.entity.CafeTag.CafeTag;
-import com.Minjin.TagCafe.entity.CafeTag.CafeTagRepository;
-import com.Minjin.TagCafe.entity.Tag.Tag;
-import com.Minjin.TagCafe.entity.Tag.TagRepository;
+import com.Minjin.TagCafe.entity.Cafe;
+import com.Minjin.TagCafe.repository.CafeRepository;
+import com.Minjin.TagCafe.entity.CafeTag;
+import com.Minjin.TagCafe.repository.CafeTagRepository;
+import com.Minjin.TagCafe.entity.Tag;
+import com.Minjin.TagCafe.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.Minjin.TagCafe.dto.CafeDto;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 

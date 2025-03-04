@@ -1,7 +1,8 @@
-package com.Minjin.TagCafe.entity.CafeTag;
+package com.Minjin.TagCafe.repository;
 
-import com.Minjin.TagCafe.entity.Cafe.Cafe;
-import com.Minjin.TagCafe.entity.Tag.Tag;
+import com.Minjin.TagCafe.entity.Cafe;
+import com.Minjin.TagCafe.entity.CafeTag;
+import com.Minjin.TagCafe.entity.Tag;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

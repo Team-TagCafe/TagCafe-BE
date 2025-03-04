@@ -1,7 +1,7 @@
 package com.Minjin.TagCafe.controller;
 
 import com.Minjin.TagCafe.dto.CafeDto;
-import com.Minjin.TagCafe.entity.Cafe.Cafe;
+import com.Minjin.TagCafe.entity.Cafe;
 import com.Minjin.TagCafe.service.CafeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
