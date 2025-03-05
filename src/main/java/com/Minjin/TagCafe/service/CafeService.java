@@ -43,6 +43,30 @@ public class CafeService {
     public List<Cafe> getCafesByMultipleTagsAndValues(List<String> tagNames, List<String> values) {
         List<Cafe> filteredCafes = cafeRepository.findAll(); // 기본적으로 모든 카페 가져오기
 
+        // 평점 필터 확인 및 처리
+        boolean hasGradeFilter = tagNames.contains("평점");
+        if (hasGradeFilter) {
+            int index = tagNames.indexOf("평점");
+            String gradeFilter = values.get(index);
+
+            final double minGrade = switch (gradeFilter) {
+                case "5.0" -> 5.0;
+                case "4.0 이상" -> 4.0;
+                case "3.0 이상" -> 3.0;
+                default -> 0.0;
+            };
+
+            // 평점 태그를 리스트에서 제거 (CafeTag 검색에서 제외)
+            tagNames.remove(index);
+            values.remove(index);
+
+            // 평균 평점이 기준 이상인 카페 필터링
+            filteredCafes = filteredCafes.stream()
+                    .filter(cafe -> cafe.getAverageGrade() >= minGrade)
+                    .collect(Collectors.toList());
+        }
+
+        // 태그 기반 필터링 (평점 외 나머지 태그 적용)
         for (int i = 0; i < tagNames.size(); i++) {
             String tagName = tagNames.get(i);
             String value = values.get(i);
@@ -53,7 +77,6 @@ public class CafeService {
             List<CafeTag> cafeTags = cafeTagRepository.findByTagAndValue(tag, value);
             List<Cafe> filteredByTag = cafeTags.stream().map(CafeTag::getCafe).collect(Collectors.toList());
 
-            // ✅ 모든 조건을 만족하는 카페만 남김 (AND 조건)
             filteredCafes.retainAll(filteredByTag);
         }
 
