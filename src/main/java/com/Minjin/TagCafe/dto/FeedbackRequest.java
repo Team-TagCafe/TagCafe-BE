@@ -7,4 +7,5 @@ import lombok.Setter;
 @Setter
 public class FeedbackRequest {
     private String content;
+    private String email;
 }

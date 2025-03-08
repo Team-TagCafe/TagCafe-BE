@@ -14,4 +14,7 @@ public class Feedback {
 
     @Column(nullable = false, length = 200)
     private String content;
+
+    @Column(nullable = false)
+    private String email;
 }

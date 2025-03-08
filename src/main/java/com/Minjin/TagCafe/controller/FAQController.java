@@ -41,6 +41,7 @@ public class FAQController {
     public ResponseEntity<Map<String, String>> submitFeedback(@RequestBody FeedbackRequest request) {
         Feedback feedback = new Feedback();
         feedback.setContent(request.getContent());
+        feedback.setEmail(request.getEmail());
         feedbackRepository.save(feedback);
 
         Map<String, String> response = new HashMap<>();
