@@ -27,6 +27,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/users/delete").permitAll()
                         .requestMatchers("/oauth/kakao/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // ✅ Preflight 요청 허용
+                        .requestMatchers("/faq/**").permitAll()
+                        //.anyRequest().authenticated()
                         .anyRequest().permitAll() // 모든 요청 허용
                 )
                 .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("/"))
