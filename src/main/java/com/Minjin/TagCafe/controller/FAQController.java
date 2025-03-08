@@ -4,7 +4,9 @@ import com.Minjin.TagCafe.dto.FAQResponse;
 import com.Minjin.TagCafe.dto.FeedbackRequest;
 import com.Minjin.TagCafe.dto.FeedbackResponse;
 import com.Minjin.TagCafe.entity.Feedback;
+import com.Minjin.TagCafe.entity.QA;
 import com.Minjin.TagCafe.repository.FeedbackRepository;
+import com.Minjin.TagCafe.repository.QARepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,20 +22,18 @@ import java.util.stream.Collectors;
 public class FAQController {
 
     private final FeedbackRepository feedbackRepository;
-
-    public FAQController(FeedbackRepository feedbackRepository) {
+    private final QARepository qaRepository;
+    public FAQController(FeedbackRepository feedbackRepository, QARepository qaRepository) {
         this.feedbackRepository = feedbackRepository;
+        this.qaRepository = qaRepository;
     }
+
 
     //자주 묻는 질문 조회
     @GetMapping("/qa")
-    public @ResponseBody ResponseEntity<List<FAQResponse>> getFAQs() {
-        List<FAQResponse> faqs = Arrays.asList(
-                new FAQResponse("서비스 관련", "필터를 어떻게 사용하나요?", "필터는 검색창 옆의 버튼을 클릭하여 사용할 수 있습니다."),
-                new FAQResponse("서비스 관련", "회원 가입 없이 사용할 수 있나요?", "회원 가입 없이도 일부 서비스를 이용할 수 있습니다."),
-                new FAQResponse("기능 관련", "내가 좋아하는 카페를 추가할 수 있나요?", "내 프로필에서 좋아하는 카페를 추가할 수 있습니다.")
-        );
-        return ResponseEntity.ok().body(faqs);
+    public ResponseEntity<List<QA>> getQAs() {
+        List<QA> qaList = qaRepository.findAll();
+        return ResponseEntity.ok(qaList);
     }
 
     //사용자 의견 및 오류 제보 제출
