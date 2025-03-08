@@ -27,7 +27,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/users/delete").permitAll()
                         .requestMatchers("/oauth/kakao/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // ✅ Preflight 요청 허용
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll() // 모든 요청 허용
                 )
                 .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("/"))
                 .logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/"));
@@ -38,9 +38,9 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000")); // 프론트엔드 도메인 허용
+        configuration.setAllowedOriginPatterns(List.of("*")); // 프론트엔드 도메인 허용
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
+        configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true); // 쿠키 포함 허용
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
