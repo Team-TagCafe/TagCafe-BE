@@ -19,9 +19,18 @@ public class CafeController {
 
     // id로 카페 조회
     @GetMapping("/{cafeId}")
-    public ResponseEntity<Cafe> getCafeById(@PathVariable("cafeId") Long cafeId) {
+    public ResponseEntity<CafeDto> getCafeById(@PathVariable("cafeId") Long cafeId) {
         Cafe cafe = cafeService.getCafeById(cafeId);
-        return ResponseEntity.ok(cafe);
+        CafeDto cafeDto = new CafeDto(
+                cafe.getKakaoPlaceId(),
+                cafe.getCafeName(),
+                cafe.getLatitude(),
+                cafe.getLongitude(),
+                cafe.getAddress(),
+                cafe.getPhoneNumber(),
+                cafe.getWebsiteUrl()
+        );
+        return ResponseEntity.ok(cafeDto);
     }
 
     // 검색
