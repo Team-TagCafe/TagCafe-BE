@@ -1,46 +1,51 @@
 package com.Minjin.TagCafe.entity;
 
+import com.Minjin.TagCafe.entity.enums.CafeAttributes.*;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-import java.util.HashSet;
-import java.util.Set;
+import lombok.*;
 
 @Entity
+@Table(name = "Review")
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "reviews")
+@AllArgsConstructor
+@Builder
 public class Review {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long cafeId; // 카페 ID
-    private String userEmail; // 리뷰 작성자 이메일
-    private int rating; // 별점
-    private String content; // 리뷰 내용
+    @ManyToOne
+    @JoinColumn(name = "cafe_id", nullable = false)
+    private Cafe cafe; // 연관된 카페
 
-    @ManyToMany
-    @JoinTable(
-            name = "review_tags",
-            joinColumns = @JoinColumn(name = "review_id"),
-            inverseJoinColumns = @JoinColumn(name = "tag_id")
-    )
-    private Set<Tag> tags = new HashSet<>(); // 리뷰에 연결된 태그 목록
+    @Column(nullable = false)
+    private String userEmail;
 
-    @Column(nullable = false, updatable = false)
-    private String createdAt; // 작성 날짜
+    @Column(nullable = false)
+    private int rating;
 
-    public Review(Long cafeId, String userEmail, int rating, String content, Set<Tag> tags, String createdAt) {
-        this.cafeId = cafeId;
-        this.userEmail = userEmail;
-        this.rating = rating;
-        this.content = content;
-        this.tags = tags;
-        this.createdAt = createdAt;
-    }
+    @Column(nullable = false, length = 500)
+    private String content;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private WifiSpeed wifi;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private OutletAvailability outlets;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private DeskSize desk;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private RestroomAvailability restroom;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ParkingAvailability parking;
 }

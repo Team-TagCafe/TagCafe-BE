@@ -45,8 +45,6 @@ public class Cafe {
     @Column(nullable = false)
     private double averageGrade = 0.0; // 기본값 0.0
 
-    @OneToMany(mappedBy = "cafe", cascade = CascadeType.PERSIST, orphanRemoval = true)
-    private List<CafeTag> tags;
 
     public Cafe(Long kakaoPlaceId, String cafeName, double latitude, double longitude, String address, String phoneNumber, String websiteUrl) {
         this.kakaoPlaceId = kakaoPlaceId;

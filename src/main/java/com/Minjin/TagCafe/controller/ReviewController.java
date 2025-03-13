@@ -11,17 +11,20 @@ import java.util.List;
 @RestController
 @RequestMapping("/reviews")
 public class ReviewController {
-
     private final ReviewService reviewService;
 
     public ReviewController(ReviewService reviewService) {
         this.reviewService = reviewService;
     }
 
-    // 리뷰 등록 (태그 포함)
     @PostMapping("/create")
-    public ResponseEntity<Review> createReview(@RequestBody ReviewDTO reviewDTO) {
-        Review savedReview = reviewService.saveReview(reviewDTO);
-        return ResponseEntity.ok(savedReview);
+    public ResponseEntity<String> createReview(@RequestBody ReviewDTO reviewDTO) {
+        reviewService.saveReview(reviewDTO);
+        return ResponseEntity.ok("리뷰가 저장되었습니다.");
+    }
+
+    @GetMapping("/{cafeId}")
+    public ResponseEntity<List<Review>> getReviewsByCafe(@PathVariable Long cafeId) {
+        return ResponseEntity.ok(reviewService.getReviewsByCafeId(cafeId));
     }
 }
