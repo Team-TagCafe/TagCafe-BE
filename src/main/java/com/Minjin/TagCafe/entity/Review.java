@@ -42,7 +42,7 @@ public class Review {
     private DeskSize desk;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length=50)
     private RestroomAvailability restroom;
 
     @Enumerated(EnumType.STRING)

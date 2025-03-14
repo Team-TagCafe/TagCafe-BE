@@ -19,6 +19,11 @@ public class ReviewController {
 
     @PostMapping("/create")
     public ResponseEntity<String> createReview(@RequestBody ReviewDTO reviewDTO) {
+        System.out.println("Received DTO:"+ reviewDTO);
+
+        if (reviewDTO.getUserEmail() == null || reviewDTO.getUserEmail().isEmpty()) {
+            return ResponseEntity.badRequest().body("userEmail이 필요합니다.");
+        }
         reviewService.saveReview(reviewDTO);
         return ResponseEntity.ok("리뷰가 저장되었습니다.");
     }
