@@ -11,17 +11,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/saved-cafes")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class SavedCafeController {
     private final SavedCafeService savedCafeService;
-
-    // 카페 저장
-    @PostMapping("/{cafeId}")
-    public ResponseEntity<SavedCafe> saveCafe(
-            @RequestParam("userId") Long userId,
-            @PathVariable("cafeId") Long cafeId) {
-        return ResponseEntity.ok(savedCafeService.saveCafe(userId, cafeId));
-    }
 
     // 저장한 카페 목록 조회
     @GetMapping
@@ -29,11 +20,14 @@ public class SavedCafeController {
         return ResponseEntity.ok(savedCafeService.getSavedCafes(userId));
     }
 
-    // 저장한 카페 삭제
-    @DeleteMapping("/{cafeId}")
-    public ResponseEntity<Void> removeSavedCafe(@RequestParam("userId") Long userId, @PathVariable("cafeId") Long cafeId) {
-        savedCafeService.removeSavedCafe(userId, cafeId);
-        return ResponseEntity.noContent().build();
+    // 카페 저장 여부 토글 (저장 or 삭제)
+    @PatchMapping("/{cafeId}")
+    public ResponseEntity<Boolean> toggleSavedStatus(
+            @RequestParam("userId") Long userId,
+            @PathVariable("cafeId") Long cafeId) {
+
+        boolean isSaved = savedCafeService.toggleSavedStatus(userId, cafeId);
+        return ResponseEntity.ok(isSaved); // 저장 여부 반환
     }
 
     // 방문여부 업데이트
