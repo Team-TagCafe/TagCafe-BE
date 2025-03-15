@@ -3,6 +3,9 @@ package com.Minjin.TagCafe.entity;
 import com.Minjin.TagCafe.entity.enums.CafeAttributes.*;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "Review")
@@ -19,6 +22,10 @@ public class Review {
     @ManyToOne
     @JoinColumn(name = "cafe_id", nullable = false)
     private Cafe cafe; // 연관된 카페
+
+    public Cafe getCafe() {
+        return cafe;
+    }
 
     @Column(nullable = false)
     private String userEmail;
@@ -48,4 +55,8 @@ public class Review {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ParkingAvailability parking;
+
+    @CreationTimestamp  // 자동으로 생성 시간 기록
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
 }
