@@ -53,7 +53,7 @@ public class Review {
     private RestroomAvailability restroom;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length=50)
     private ParkingAvailability parking;
 
     @CreationTimestamp  // 자동으로 생성 시간 기록
