@@ -2,6 +2,7 @@ package com.Minjin.TagCafe.controller;
 
 import com.Minjin.TagCafe.dto.CafeDto;
 import com.Minjin.TagCafe.entity.Cafe;
+import com.Minjin.TagCafe.repository.CafeRepository;
 import com.Minjin.TagCafe.service.CafeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,19 +17,26 @@ import java.util.List;
 @CrossOrigin(origins = "https://localhost:3000") // React에서 API 호출 허용
 public class CafeController {
     private final CafeService cafeService;
+    private final CafeRepository cafeRepository;
 
     // id로 카페 조회
     @GetMapping("/{cafeId}")
     public ResponseEntity<CafeDto> getCafeById(@PathVariable("cafeId") Long cafeId) {
         Cafe cafe = cafeService.getCafeById(cafeId);
         CafeDto cafeDto = new CafeDto(
+                cafe.getCafeId(),
                 cafe.getKakaoPlaceId(),
                 cafe.getCafeName(),
                 cafe.getLatitude(),
                 cafe.getLongitude(),
                 cafe.getAddress(),
                 cafe.getPhoneNumber(),
-                cafe.getWebsiteUrl()
+                cafe.getWebsiteUrl(),
+                cafe.getWifi(),
+                cafe.getOutlets(),
+                cafe.getDesk(),
+                cafe.getRestroom(),
+                cafe.getParking()
         );
         return ResponseEntity.ok(cafeDto);
     }
@@ -78,6 +86,30 @@ public class CafeController {
     public ResponseEntity<?> addCafe(@RequestBody CafeDto cafeDto) {
         Cafe savedCafe = cafeService.addCafe(cafeDto);
         return ResponseEntity.ok(savedCafe);
+    }
+
+    // admin - 태그 값 업데이트
+    @PutMapping("/{cafeId}/tags")
+    public ResponseEntity<Cafe> updateCafeTags(@PathVariable("cafeId") Long cafeId,
+                                               @RequestBody CafeDto cafeDto) {
+        Cafe cafe = cafeRepository.findById(cafeId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 카페를 찾을 수 없습니다."));
+
+        if (cafeDto.getWifi() != null) cafe.setWifi(cafeDto.getWifi());
+        if (cafeDto.getOutlets() != null) cafe.setOutlets(cafeDto.getOutlets());
+        if (cafeDto.getDesk() != null) cafe.setDesk(cafeDto.getDesk());
+        if (cafeDto.getRestroom() != null) cafe.setRestroom(cafeDto.getRestroom());
+        if (cafeDto.getParking() != null) cafe.setParking(cafeDto.getParking());
+
+        Cafe updatedCafe = cafeRepository.save(cafe);
+        return ResponseEntity.ok(updatedCafe);
+    }
+
+    // 모든 카페 조회 API 추가
+    @GetMapping
+    public ResponseEntity<List<Cafe>> getAllCafes() {
+        List<Cafe> cafes = cafeService.getAllCafes();
+        return ResponseEntity.ok(cafes);
     }
 
 }

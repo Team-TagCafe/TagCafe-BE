@@ -116,4 +116,9 @@ public class CafeService {
 
         return cafeRepository.save(cafe);
     }
+
+    public List<Cafe> getAllCafes() {
+        return cafeRepository.findAll();
+    }
+
 }
