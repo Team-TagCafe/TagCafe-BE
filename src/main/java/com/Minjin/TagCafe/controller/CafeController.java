@@ -5,11 +5,17 @@ import com.Minjin.TagCafe.entity.Cafe;
 import com.Minjin.TagCafe.repository.CafeRepository;
 import com.Minjin.TagCafe.service.CafeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/cafes")
@@ -110,6 +116,28 @@ public class CafeController {
     public ResponseEntity<List<Cafe>> getAllCafes() {
         List<Cafe> cafes = cafeService.getAllCafes();
         return ResponseEntity.ok(cafes);
+    }
+
+    @GetMapping("/{cafeId}/tags")
+    public ResponseEntity<Map<String, String>> getCafeTags(@PathVariable("cafeId") Long cafeId) {
+        Cafe cafe = cafeRepository.findById(cafeId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 카페를 찾을 수 없습니다."));
+
+        Map<String, String> tags = new HashMap<>();
+
+        // null 값 방지 (기본 값 설정)
+        tags.put("wifi", getEnumNameOrDefault(cafe.getWifi()));
+        tags.put("outlets", getEnumNameOrDefault(cafe.getOutlets()));
+        tags.put("desk", getEnumNameOrDefault(cafe.getDesk()));
+        tags.put("restroom", getEnumNameOrDefault(cafe.getRestroom()));
+        tags.put("parking", getEnumNameOrDefault(cafe.getParking()));
+
+        return ResponseEntity.ok(tags);
+    }
+
+    // Enum 값이 null이면 "-"을 반환
+    private String getEnumNameOrDefault(Enum<?> enumValue) {
+        return enumValue != null ? enumValue.name() : "-";
     }
 
 }
