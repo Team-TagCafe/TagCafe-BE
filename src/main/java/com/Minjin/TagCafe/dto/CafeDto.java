@@ -3,6 +3,8 @@ package com.Minjin.TagCafe.dto;
 import com.Minjin.TagCafe.entity.enums.CafeAttributes;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Data
 @Getter
 @Setter
@@ -17,6 +19,7 @@ public class CafeDto {
     private String address;
     private String phoneNumber;
     private String websiteUrl;
+    private LocalDateTime updateAt;
 
     private CafeAttributes.WifiSpeed wifi;
     private CafeAttributes.OutletAvailability outlets;

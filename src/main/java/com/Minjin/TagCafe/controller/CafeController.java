@@ -38,6 +38,7 @@ public class CafeController {
                 cafe.getAddress(),
                 cafe.getPhoneNumber(),
                 cafe.getWebsiteUrl(),
+                cafe.getUpdateAt(),
                 cafe.getWifi(),
                 cafe.getOutlets(),
                 cafe.getDesk(),
