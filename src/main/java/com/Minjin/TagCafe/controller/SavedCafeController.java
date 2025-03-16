@@ -39,4 +39,15 @@ public class SavedCafeController {
 
         return ResponseEntity.ok(savedCafeService.toggleVisitedStatus(userId, cafeId));
     }
+
+    // 저장한 카페 목록 + 필터링 적용
+    @GetMapping("/filter")
+    public ResponseEntity<List<SavedCafeDTO>> getSavedCafesWithFilter(
+            @RequestParam("userId") Long userId,
+            @RequestParam(value = "tags", required = false) List<String> tagNames,
+            @RequestParam(value = "values", required = false) List<String> values) {
+
+        return ResponseEntity.ok(savedCafeService.getSavedCafesWithFilter(userId, tagNames, values));
+    }
+
 }
