@@ -55,6 +55,7 @@ public class ReviewService {
             String cafeName = (cafe != null) ? cafe.getCafeName() : "알 수 없는 카페";
 
             return new ReviewDTO(
+                    review.getId(),
                     review.getCafe().getCafeId(),
                     cafeName,
                     review.getUserEmail(),
@@ -69,6 +70,29 @@ public class ReviewService {
             );
         }).collect(Collectors.toList());
     }
+
+    public ReviewDTO getReviewById(Long reviewId) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 리뷰가 존재하지 않습니다."));
+        return new ReviewDTO(review);
+    }
+
+    @Transactional
+    public void updateReview(Long reviewId, ReviewDTO dto) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 리뷰입니다."));
+
+        review.setRating(dto.getRating());
+        review.setContent(dto.getContent());
+        review.setWifi(dto.getWifi());
+        review.setOutlets(dto.getOutlets());
+        review.setDesk(dto.getDesk());
+        review.setRestroom(dto.getRestroom());
+        review.setParking(dto.getParking());
+
+        reviewRepository.save(review);
+    }
+
 
 
     /**
