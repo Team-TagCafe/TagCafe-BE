@@ -70,4 +70,14 @@ public class MyController {
         reviewService.updateReview(reviewId, dto);
         return ResponseEntity.ok("리뷰가 성공적으로 수정되었습니다.");
     }
+
+    @DeleteMapping("/reviews/{reviewId}")
+    public ResponseEntity<String> deleteReview(@PathVariable("reviewId") Long reviewId) {
+        try {
+            reviewService.deleteReview(reviewId);
+            return ResponseEntity.ok("리뷰가 성공적으로 삭제되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("리뷰 삭제 실패");
+        }
+    }
 }

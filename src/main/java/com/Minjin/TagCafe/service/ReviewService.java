@@ -93,6 +93,13 @@ public class ReviewService {
         reviewRepository.save(review);
     }
 
+    @Transactional
+    public void deleteReview(Long reviewId) {
+        if (!reviewRepository.existsById(reviewId)) {
+            throw new IllegalArgumentException("해당 리뷰가 존재하지 않습니다.");
+        }
+        reviewRepository.deleteById(reviewId);
+    }
 
 
     /**
