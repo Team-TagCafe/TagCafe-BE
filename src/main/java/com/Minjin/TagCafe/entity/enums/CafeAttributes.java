@@ -1,5 +1,7 @@
 package com.Minjin.TagCafe.entity.enums;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class CafeAttributes {
     public enum WifiSpeed {
         빠름, 보통, 없음
@@ -18,6 +20,9 @@ public class CafeAttributes {
     }
 
     public enum ParkingAvailability {
-        가능_무료, 가능_유료, 가능_일부제공, 불가능
+        @JsonProperty("가능_무료") 가능_무료,
+        @JsonProperty("가능_유료") 가능_유료,
+        @JsonProperty("불가능") 불가능,
+        @JsonProperty("가능_일부") 가능_일부;
     }
 }

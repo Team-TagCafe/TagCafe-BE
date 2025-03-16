@@ -66,7 +66,7 @@ public class MyController {
     }
 
     @PutMapping("/reviews/{reviewId}")
-    public ResponseEntity<String> updateReview(@PathVariable Long reviewId, @RequestBody ReviewDTO dto) {
+    public ResponseEntity<String> updateReview(@PathVariable("reviewId") Long reviewId, @RequestBody ReviewDTO dto) {
         reviewService.updateReview(reviewId, dto);
         return ResponseEntity.ok("리뷰가 성공적으로 수정되었습니다.");
     }
