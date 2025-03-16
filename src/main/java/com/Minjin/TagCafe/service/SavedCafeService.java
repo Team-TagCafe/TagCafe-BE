@@ -1,5 +1,6 @@
 package com.Minjin.TagCafe.service;
 
+import com.Minjin.TagCafe.dto.SavedCafeDTO;
 import com.Minjin.TagCafe.entity.Cafe;
 import com.Minjin.TagCafe.entity.SavedCafe;
 import com.Minjin.TagCafe.entity.User;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,10 +23,12 @@ public class SavedCafeService {
     private final CafeRepository cafeRepository;
 
     // 저장한 카페 목록 조회
-    public List<SavedCafe> getSavedCafes(Long userId) {
+    public List<SavedCafeDTO> getSavedCafes(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-        return savedCafeRepository.findByUser(user);
+        return savedCafeRepository.findByUser(user).stream()
+                .map(savedCafe -> new SavedCafeDTO(savedCafe.getCafe(), savedCafe.getVisited()))
+                .collect(Collectors.toList());
     }
 
     // 저장 여부에 따라 추가 또는 삭제 (토글 기능)

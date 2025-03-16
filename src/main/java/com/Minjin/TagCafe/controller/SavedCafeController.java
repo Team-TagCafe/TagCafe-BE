@@ -1,5 +1,6 @@
 package com.Minjin.TagCafe.controller;
 
+import com.Minjin.TagCafe.dto.SavedCafeDTO;
 import com.Minjin.TagCafe.entity.SavedCafe;
 import com.Minjin.TagCafe.service.SavedCafeService;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,7 @@ public class SavedCafeController {
 
     // 저장한 카페 목록 조회
     @GetMapping
-    public ResponseEntity<List<SavedCafe>> getSavedCafes(@RequestParam("userId") Long userId) {
+    public ResponseEntity<List<SavedCafeDTO>> getSavedCafes(@RequestParam("userId") Long userId) {
         return ResponseEntity.ok(savedCafeService.getSavedCafes(userId));
     }
 
