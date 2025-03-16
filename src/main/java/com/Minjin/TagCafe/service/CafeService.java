@@ -62,21 +62,29 @@ public class CafeService {
                     .collect(Collectors.toList());
         }
 
-        // 태그 기반 필터링 (리뷰에서 태그 데이터 활용)
+        // 태그 필터 적용 (Cafe 엔티티 내 필드 기반)
         for (int i = 0; i < tagNames.size(); i++) {
             String tagName = tagNames.get(i);
             String value = values.get(i);
 
-            // 특정 태그가 일치하는 리뷰를 가진 카페 목록 조회
-            List<Cafe> filteredByTag = cafeRepository.findAll().stream()
-                    .filter(cafe -> reviewRepository.findByCafe_CafeId(cafe.getCafeId()).stream()
-                            .anyMatch(review -> reviewMatchesTag(review, tagName, value)))
+            final String filterValue = value; // Lambda 사용을 위한 final 변수
+            filteredCafes = filteredCafes.stream()
+                    .filter(cafe -> cafeMatchesTag(cafe, tagName, filterValue))
                     .collect(Collectors.toList());
-
-            filteredCafes.retainAll(filteredByTag);
         }
 
         return filteredCafes;
+    }
+
+    private boolean cafeMatchesTag(Cafe cafe, String tagName, String value) {
+        return switch (tagName) {
+            case "와이파이" -> cafe.getWifi() != null && cafe.getWifi().name().equals(value);
+            case "콘센트" -> cafe.getOutlets() != null && cafe.getOutlets().name().equals(value);
+            case "책상" -> cafe.getDesk() != null && cafe.getDesk().name().equals(value);
+            case "화장실" -> cafe.getRestroom() != null && cafe.getRestroom().name().equals(value);
+            case "주차" -> cafe.getParking() != null && cafe.getParking().name().equals(value);
+            default -> false;
+        };
     }
 
     /**

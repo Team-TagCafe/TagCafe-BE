@@ -14,10 +14,10 @@ public class CafeAttributes {
     }
 
     public enum RestroomAvailability {
-        가능, 불가능
+        실내, 외부
     }
 
     public enum ParkingAvailability {
-        가능_무료, 가능_유료, 가능_일부제공, 불가능
+        가능_무료, 가능_유료, 가능_일부, 불가능
     }
 }
