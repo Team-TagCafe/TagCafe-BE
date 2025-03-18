@@ -1,5 +1,7 @@
 package com.Minjin.TagCafe.entity.enums;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class CafeAttributes {
     public enum WifiSpeed {
         빠름, 보통, 없음

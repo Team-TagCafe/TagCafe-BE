@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findByCafe_CafeId(Long cafeId);
+    List<Review> findByUserEmail(String userEmail);
+
 }
