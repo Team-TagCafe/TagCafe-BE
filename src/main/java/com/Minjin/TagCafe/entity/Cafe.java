@@ -1,5 +1,6 @@
 package com.Minjin.TagCafe.entity;
 
+import com.Minjin.TagCafe.entity.enums.CafeAttributes;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -45,8 +46,26 @@ public class Cafe {
     @Column(nullable = false)
     private double averageGrade = 0.0; // 기본값 0.0
 
-    @OneToMany(mappedBy = "cafe", cascade = CascadeType.PERSIST, orphanRemoval = true)
-    private List<CafeTag> tags;
+    @Enumerated(EnumType.STRING)
+    @Column
+    private CafeAttributes.WifiSpeed wifi;
+
+    @Enumerated(EnumType.STRING)
+    @Column
+    private CafeAttributes.OutletAvailability outlets;
+
+    @Enumerated(EnumType.STRING)
+    @Column
+    private CafeAttributes.DeskSize desk;
+
+    @Enumerated(EnumType.STRING)
+    @Column
+    private CafeAttributes.RestroomAvailability restroom;
+
+    @Enumerated(EnumType.STRING)
+    @Column
+    private CafeAttributes.ParkingAvailability parking;
+
 
     public Cafe(Long kakaoPlaceId, String cafeName, double latitude, double longitude, String address, String phoneNumber, String websiteUrl) {
         this.kakaoPlaceId = kakaoPlaceId;

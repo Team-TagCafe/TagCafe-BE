@@ -2,13 +2,11 @@ package com.Minjin.TagCafe.service;
 
 import com.Minjin.TagCafe.entity.Cafe;
 import com.Minjin.TagCafe.repository.CafeRepository;
-import com.Minjin.TagCafe.entity.CafeTag;
-import com.Minjin.TagCafe.repository.CafeTagRepository;
-import com.Minjin.TagCafe.entity.Tag;
-import com.Minjin.TagCafe.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.Minjin.TagCafe.dto.CafeDto;
+import com.Minjin.TagCafe.entity.Review;
+import com.Minjin.TagCafe.repository.ReviewRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,14 +16,12 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class CafeService {
     private final CafeRepository cafeRepository;
-    private final CafeTagRepository cafeTagRepository;
-    private final TagRepository tagRepository;
+    private final ReviewRepository reviewRepository;
 
     // ID로 카페 조회
     public Cafe getCafeById(Long cafeId) {
         return cafeRepository.findById(cafeId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 카페를 찾을 수 없습니다."));
-
     }
 
     // 하나의 키워드로 카페 조회 (카페 이름, 주소 구분 X)
@@ -56,7 +52,7 @@ public class CafeService {
                 default -> 0.0;
             };
 
-            // 평점 태그를 리스트에서 제거 (CafeTag 검색에서 제외)
+            // 평점 태그를 리스트에서 제거
             tagNames.remove(index);
             values.remove(index);
 
@@ -66,23 +62,44 @@ public class CafeService {
                     .collect(Collectors.toList());
         }
 
-        // 태그 기반 필터링 (평점 외 나머지 태그 적용)
+        // 태그 필터 적용 (Cafe 엔티티 내 필드 기반)
         for (int i = 0; i < tagNames.size(); i++) {
             String tagName = tagNames.get(i);
             String value = values.get(i);
 
-            Tag tag = tagRepository.findByTagName(tagName)
-                    .orElseThrow(() -> new IllegalArgumentException("태그를 찾을 수 없습니다: " + tagName));
-
-            List<CafeTag> cafeTags = cafeTagRepository.findByTagAndValue(tag, value);
-            List<Cafe> filteredByTag = cafeTags.stream().map(CafeTag::getCafe).collect(Collectors.toList());
-
-            filteredCafes.retainAll(filteredByTag);
+            final String filterValue = value; // Lambda 사용을 위한 final 변수
+            filteredCafes = filteredCafes.stream()
+                    .filter(cafe -> cafeMatchesTag(cafe, tagName, filterValue))
+                    .collect(Collectors.toList());
         }
 
         return filteredCafes;
     }
 
+    private boolean cafeMatchesTag(Cafe cafe, String tagName, String value) {
+        return switch (tagName) {
+            case "와이파이" -> cafe.getWifi() != null && cafe.getWifi().name().equals(value);
+            case "콘센트" -> cafe.getOutlets() != null && cafe.getOutlets().name().equals(value);
+            case "책상" -> cafe.getDesk() != null && cafe.getDesk().name().equals(value);
+            case "화장실" -> cafe.getRestroom() != null && cafe.getRestroom().name().equals(value);
+            case "주차" -> cafe.getParking() != null && cafe.getParking().name().equals(value);
+            default -> false;
+        };
+    }
+
+    /**
+     * 특정 리뷰가 사용자가 입력한 태그와 일치하는지 확인하는 메서드
+     */
+    private boolean reviewMatchesTag(Review review, String tagName, String value) {
+        return switch (tagName) {
+            case "와이파이" -> review.getWifi() != null && review.getWifi().name().equals(value);
+            case "콘센트" -> review.getOutlets() != null && review.getOutlets().name().equals(value);
+            case "책상" -> review.getDesk() != null && review.getDesk().name().equals(value);
+            case "화장실" -> review.getRestroom() != null && review.getRestroom().name().equals(value);
+            case "주차" -> review.getParking() != null && review.getParking().name().equals(value);
+            default -> false;
+        };
+    }
 
     // 지도 영역 내 카페 조회
     public List<Cafe> getCafesInArea(double minLat, double maxLat, double minLng, double maxLng) {
@@ -107,4 +124,9 @@ public class CafeService {
 
         return cafeRepository.save(cafe);
     }
+
+    public List<Cafe> getAllCafes() {
+        return cafeRepository.findAll();
+    }
+
 }

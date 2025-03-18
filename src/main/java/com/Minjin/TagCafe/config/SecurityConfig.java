@@ -28,6 +28,8 @@ public class SecurityConfig {
                         .requestMatchers("/oauth/kakao/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // ✅ Preflight 요청 허용
                         .requestMatchers("/faq/**").permitAll()
+                        .requestMatchers("/my/**").permitAll()
+
                         //.anyRequest().authenticated()
                         .anyRequest().permitAll() // 모든 요청 허용
                 )
@@ -41,7 +43,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOriginPatterns(List.of("*")); // 프론트엔드 도메인 허용
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true); // 쿠키 포함 허용
 
