@@ -8,6 +8,7 @@ import com.Minjin.TagCafe.repository.ReviewRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -102,35 +103,59 @@ public class ReviewService {
     }
 
 
-    /**
-     * 특정 카페의 모든 리뷰에서 태그 빈도 분석
+    public List<ReviewDTO> getReviewsWithFilter(String userEmail, List<String> tagNames, List<String> values) {
+        List<Review> reviews = reviewRepository.findByUserEmail(userEmail);
 
-    public Map<String, Long> getCafeTagStatistics(Long cafeId) {
-        List<Review> reviews = reviewRepository.findByCafeId(cafeId);
+        if (tagNames == null) tagNames = new ArrayList<>();
+        if (values == null) values = new ArrayList<>();
 
-        Map<String, Long> tagCount = new HashMap<>();
+        // 🔹 평점 필터 적용
+        boolean hasGradeFilter = tagNames.contains("평점");
+        if (hasGradeFilter) {
+            int index = tagNames.indexOf("평점");
+            String gradeFilter = values.get(index);
 
-        tagCount.put("wifi_빠름", reviews.stream().filter(r -> r.getWifi() == WifiSpeed.빠름).count());
-        tagCount.put("wifi_보통", reviews.stream().filter(r -> r.getWifi() == WifiSpeed.보통).count());
-        tagCount.put("wifi_없음", reviews.stream().filter(r -> r.getWifi() == WifiSpeed.없음).count());
+            final double minGrade = switch (gradeFilter) {
+                case "5.0" -> 5.0;
+                case "4.0 이상" -> 4.0;
+                case "3.0 이상" -> 3.0;
+                default -> 0.0;
+            };
 
-        tagCount.put("outlets_자리마다", reviews.stream().filter(r -> r.getOutlets() == OutletAvailability.자리마다).count());
-        tagCount.put("outlets_일부", reviews.stream().filter(r -> r.getOutlets() == OutletAvailability.일부).count());
-        tagCount.put("outlets_없음", reviews.stream().filter(r -> r.getOutlets() == OutletAvailability.없음).count());
+            tagNames.remove(index);
+            values.remove(index);
 
-        tagCount.put("desk_넓음", reviews.stream().filter(r -> r.getDesk() == DeskSize.넓음).count());
-        tagCount.put("desk_적당함", reviews.stream().filter(r -> r.getDesk() == DeskSize.적당함).count());
-        tagCount.put("desk_좁음", reviews.stream().filter(r -> r.getDesk() == DeskSize.좁음).count());
+            reviews = reviews.stream()
+                    .filter(review -> review.getRating() >= minGrade)
+                    .collect(Collectors.toList());
+        }
 
-        tagCount.put("restroom_가능", reviews.stream().filter(r -> r.getRestroom() == RestroomAvailability.가능).count());
-        tagCount.put("restroom_불가능", reviews.stream().filter(r -> r.getRestroom() == RestroomAvailability.불가능).count());
+        // 🔹 카페 옵션(와이파이, 콘센트 등) 필터 적용
+        for (int i = 0; i < tagNames.size(); i++) {
+            String tagName = tagNames.get(i);
+            String value = values.get(i);
 
-        tagCount.put("parking_가능_무료", reviews.stream().filter(r -> r.getParking() == ParkingAvailability.가능_무료).count());
-        tagCount.put("parking_가능_유료", reviews.stream().filter(r -> r.getParking() == ParkingAvailability.가능_유료).count());
-        tagCount.put("parking_가능_일부제공", reviews.stream().filter(r -> r.getParking() == ParkingAvailability.가능_일부제공).count());
-        tagCount.put("parking_불가능", reviews.stream().filter(r -> r.getParking() == ParkingAvailability.불가능).count());
+            final String filterValue = value;
+            reviews = reviews.stream()
+                    .filter(review -> reviewMatchesTag(review, tagName, filterValue))
+                    .collect(Collectors.toList());
+        }
 
-        return tagCount;
+        return reviews.stream()
+                .map(ReviewDTO::new)
+                .collect(Collectors.toList());
     }
-     */
+
+    private boolean reviewMatchesTag(Review review, String tagName, String value) {
+        if (value == null || tagName == null) return false; // 값이 없으면 필터링 불가능
+
+        return switch (tagName) {
+            case "와이파이" -> review.getWifi() != null && review.getWifi().name().equals(value);
+            case "콘센트" -> review.getOutlets() != null && review.getOutlets().name().equals(value);
+            case "책상" -> review.getDesk() != null && review.getDesk().name().equals(value);
+            case "화장실" -> review.getRestroom() != null && review.getRestroom().name().equals(value);
+            case "주차" -> review.getParking() != null && review.getParking().name().equals(value);
+            default -> false;
+        };
+    }
 }
