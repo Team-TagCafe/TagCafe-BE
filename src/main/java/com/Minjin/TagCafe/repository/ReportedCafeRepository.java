@@ -9,6 +9,9 @@ import java.util.List;
 
 @Repository
 public interface ReportedCafeRepository extends JpaRepository<ReportedCafe, Long> {
-    List<ReportedCafe> findByUser(User user);
+    List<ReportedCafe> findByUserEmail(String userEmail);
+
     List<ReportedCafe> findByApprovedFalse();
+
+
 }

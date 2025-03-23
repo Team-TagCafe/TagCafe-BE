@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "reported_cafe")
@@ -21,10 +22,8 @@ public class ReportedCafe {
     @Column(name = "reported_cafe_id")
     private Long reportedCafeId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    private User user;
+    @Column(nullable = false)
+    private String userEmail;
 
     private String cafeName;
 
@@ -66,4 +65,5 @@ public class ReportedCafe {
     public void setApproved(boolean approved) {
         this.approved = approved;
     }
+
 }
