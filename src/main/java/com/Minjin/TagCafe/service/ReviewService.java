@@ -47,6 +47,8 @@ public class ReviewService {
             cafe.setAverageRating(avgRating);
             cafeRepository.save(cafe);
         }
+
+        updateCafeTags(cafe);
     }
 
     public List<Review> getReviewsByCafeId(Long cafeId) {
@@ -104,6 +106,8 @@ public class ReviewService {
             cafe.setAverageRating(avgRating);
             cafeRepository.save(cafe);
         }
+
+        updateCafeTags(cafe);
     }
 
     @Transactional
@@ -117,8 +121,44 @@ public class ReviewService {
         Double avgRating = reviewRepository.findAverageRatingByCafe(cafe);
         cafe.setAverageRating(avgRating != null ? avgRating : 0.0); // 리뷰 전부 삭제되었을 경우 0.0으로 처리
         cafeRepository.save(cafe);
+
+        updateCafeTags(cafe);
     }
 
+    // 태그 최빈값 계산
+    private <T> T getMostFrequentValue(List<T> values) {
+        return values.stream()
+                .collect(Collectors.groupingBy(v -> v, Collectors.counting()))
+                .entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse(null); // 없으면 null
+    }
+
+    // Cafe 태그값 업데이트
+    private void updateCafeTags(Cafe cafe) {
+        List<Review> reviews = reviewRepository.findByCafe_CafeId(cafe.getCafeId());
+
+        if (reviews.isEmpty()) return;
+
+        cafe.setWifi(getMostFrequentValue(
+                reviews.stream().map(Review::getWifi).collect(Collectors.toList()))
+        );
+        cafe.setOutlets(getMostFrequentValue(
+                reviews.stream().map(Review::getOutlets).collect(Collectors.toList()))
+        );
+        cafe.setDesk(getMostFrequentValue(
+                reviews.stream().map(Review::getDesk).collect(Collectors.toList()))
+        );
+        cafe.setRestroom(getMostFrequentValue(
+                reviews.stream().map(Review::getRestroom).collect(Collectors.toList()))
+        );
+        cafe.setParking(getMostFrequentValue(
+                reviews.stream().map(Review::getParking).collect(Collectors.toList()))
+        );
+
+        cafeRepository.save(cafe);
+    }
 
     /**
      * 특정 카페의 모든 리뷰에서 태그 빈도 분석
