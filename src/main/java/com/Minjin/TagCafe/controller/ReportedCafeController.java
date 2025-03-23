@@ -24,7 +24,7 @@ public class ReportedCafeController {
     }
 
     @GetMapping("/{userEmail}")
-    public ResponseEntity<List<ReportedCafe>> getReportsByUser(@PathVariable String userEmail) {
+    public ResponseEntity<List<ReportedCafe>> getReportsByUser(@PathVariable("userEmail") String userEmail) {
         List<ReportedCafe> reports = reportedCafeService.getReportsByUser(userEmail);
         return ResponseEntity.ok(reports);
     }
