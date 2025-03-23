@@ -41,6 +41,12 @@ public class ReviewService {
                 .build();
 
         reviewRepository.save(review);
+
+        Double avgRating = reviewRepository.findAverageRatingByCafe(cafe);
+        if (avgRating != null) {
+            cafe.setAverageRating(avgRating);
+            cafeRepository.save(cafe);
+        }
     }
 
     public List<Review> getReviewsByCafeId(Long cafeId) {
@@ -91,14 +97,26 @@ public class ReviewService {
         review.setParking(dto.getParking());
 
         reviewRepository.save(review);
+
+        Cafe cafe = review.getCafe();
+        Double avgRating = reviewRepository.findAverageRatingByCafe(cafe);
+        if (avgRating != null) {
+            cafe.setAverageRating(avgRating);
+            cafeRepository.save(cafe);
+        }
     }
 
     @Transactional
     public void deleteReview(Long reviewId) {
-        if (!reviewRepository.existsById(reviewId)) {
-            throw new IllegalArgumentException("해당 리뷰가 존재하지 않습니다.");
-        }
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 리뷰가 존재하지 않습니다."));
+
+        Cafe cafe = review.getCafe();
         reviewRepository.deleteById(reviewId);
+
+        Double avgRating = reviewRepository.findAverageRatingByCafe(cafe);
+        cafe.setAverageRating(avgRating != null ? avgRating : 0.0); // 리뷰 전부 삭제되었을 경우 0.0으로 처리
+        cafeRepository.save(cafe);
     }
 
 
