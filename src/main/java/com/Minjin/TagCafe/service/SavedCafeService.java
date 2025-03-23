@@ -100,7 +100,7 @@ public class SavedCafeService {
             values.remove(index);
 
             savedCafes = savedCafes.stream()
-                    .filter(cafe -> cafe.getAverageGrade() >= minGrade)
+                    .filter(cafe -> cafe.getAverageRating() >= minGrade)
                     .collect(Collectors.toList());
         }
 
