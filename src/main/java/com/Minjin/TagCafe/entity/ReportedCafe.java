@@ -62,14 +62,20 @@ public class ReportedCafe {
 
     private LocalDateTime createdAt;
 
-    private boolean approved = false;
+    @Enumerated(EnumType.STRING)
+    private ReportStatus status = ReportStatus.PENDING;
 
     @OneToOne
     @JoinColumn(name = "cafe_id")
     private Cafe cafe;
 
-    public void setApproved(boolean approved) {
-        this.approved = approved;
+    public void setStatus(ReportStatus status) {
+        this.status = status;
     }
 
+    public enum ReportStatus {
+        PENDING,
+        APPROVED,
+        REJECTED
+    }
 }

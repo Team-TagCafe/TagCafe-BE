@@ -23,7 +23,7 @@ public class ReportedCafeService {
             throw new IllegalArgumentException("userEmail이 누락되었거나 비어있습니다.");
         }
         report.setCreatedAt(LocalDateTime.now());
-        report.setApproved(false);
+        report.setStatus(ReportedCafe.ReportStatus.PENDING);
         reportedCafeRepository.save(report);
     }
 

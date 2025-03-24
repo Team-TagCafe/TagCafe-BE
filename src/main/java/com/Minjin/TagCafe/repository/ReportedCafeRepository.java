@@ -10,8 +10,5 @@ import java.util.List;
 @Repository
 public interface ReportedCafeRepository extends JpaRepository<ReportedCafe, Long> {
     List<ReportedCafe> findByUserEmail(String userEmail);
-
-    List<ReportedCafe> findByApprovedFalse();
-
-
+    List<ReportedCafe> findByStatus(ReportedCafe.ReportStatus status);
 }

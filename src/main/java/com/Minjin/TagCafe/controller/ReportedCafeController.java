@@ -26,28 +26,32 @@ public class ReportedCafeController {
         return ResponseEntity.ok("제보 완료");
     }
 
-
-
     @GetMapping("/{userEmail}")
     public ResponseEntity<List<ReportedCafe>> getReportsByUser(@PathVariable("userEmail") String userEmail) {
         List<ReportedCafe> reports = reportedCafeService.getReportsByUser(userEmail);
         return ResponseEntity.ok(reports);
     }
 
-
     //관리자기능
     //미승인 제보목록조회
     @GetMapping("/admin/pending")
     public ResponseEntity<List<ReportedCafe>> getPendingReports() {
-        List<ReportedCafe> pending = reportedCafeRepository.findByApprovedFalse();
+        List<ReportedCafe> pending = reportedCafeRepository.findByStatus(ReportedCafe.ReportStatus.PENDING);
         return ResponseEntity.ok(pending);
+    }
+
+    // 모든 제보 목록 조회
+    @GetMapping("/admin/all")
+    public ResponseEntity<List<ReportedCafe>> getAllReports() {
+        List<ReportedCafe> allReports = reportedCafeRepository.findAll();
+        return ResponseEntity.ok(allReports);
     }
     //제보 승인
     @PostMapping("/admin/approve/{id}")
     public ResponseEntity<String> approveReport(@PathVariable("id") Long id) {
         ReportedCafe report = reportedCafeRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 제보가 존재하지 않습니다."));
-        report.setApproved(true);
+        report.setStatus(ReportedCafe.ReportStatus.APPROVED);
         reportedCafeRepository.save(report);
 
         Cafe cafe = new Cafe();
@@ -85,7 +89,9 @@ public class ReportedCafeController {
     public ResponseEntity<String> deleteReport(@PathVariable("id") Long id) {
         ReportedCafe report = reportedCafeRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 제보가 존재하지 않습니다."));
-        reportedCafeRepository.delete(report);
-        return ResponseEntity.ok("삭제되었습니다.");
+        report.setStatus(ReportedCafe.ReportStatus.REJECTED);
+        reportedCafeRepository.save(report);
+        return ResponseEntity.ok("반려 처리되었습니다.");
     }
+
 }
