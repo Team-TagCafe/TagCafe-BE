@@ -4,6 +4,7 @@ import com.Minjin.TagCafe.entity.enums.CafeAttributes;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
+import com.Minjin.TagCafe.entity.Cafe;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -62,6 +63,11 @@ public class ReportedCafe {
     private LocalDateTime createdAt;
 
     private boolean approved = false;
+
+    @OneToOne
+    @JoinColumn(name = "cafe_id")
+    private Cafe cafe;
+
     public void setApproved(boolean approved) {
         this.approved = approved;
     }

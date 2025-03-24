@@ -66,6 +66,9 @@ public class ReportedCafeController {
         cafe.setKakaoPlaceId(Long.valueOf(report.getKakaoPlaceId()));
         cafeRepository.save(cafe);
 
+        report.setCafe(cafe); // Cafe 객체를 ReportedCafe에 연결
+        reportedCafeRepository.save(report); // 다시 저장
+
         return ResponseEntity.ok("승인되었습니다.");
     }
 
