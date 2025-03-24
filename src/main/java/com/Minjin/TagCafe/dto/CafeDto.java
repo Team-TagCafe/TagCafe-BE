@@ -21,6 +21,8 @@ public class CafeDto {
     private String websiteUrl;
     private LocalDateTime updateAt;
     private double averageRating;
+    private String photoUrl;
+    private String openingHours;
 
     private CafeAttributes.WifiSpeed wifi;
     private CafeAttributes.OutletAvailability outlets;

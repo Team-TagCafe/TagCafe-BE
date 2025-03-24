@@ -40,6 +40,8 @@ public class CafeController {
                 cafe.getWebsiteUrl(),
                 cafe.getUpdateAt(),
                 cafe.getAverageRating(),
+                cafe.getOpeningHours(),
+                cafe.getPhotoUrl(),
                 cafe.getWifi(),
                 cafe.getOutlets(),
                 cafe.getDesk(),

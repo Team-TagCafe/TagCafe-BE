@@ -39,6 +39,9 @@ public class Cafe {
     private String phoneNumber;
     private String websiteUrl;
 
+    @Column(length = 1000)
+    private String photoUrl;
+
     @UpdateTimestamp
     private LocalDateTime updateAt;
 

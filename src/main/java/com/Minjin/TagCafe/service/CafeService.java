@@ -112,15 +112,17 @@ public class CafeService {
             throw new RuntimeException("이미 존재하는 카페입니다.");
         }
 
-        Cafe cafe = new Cafe(
-                cafeDto.getKakaoPlaceId(),
-                cafeDto.getCafeName(),
-                cafeDto.getLatitude(),
-                cafeDto.getLongitude(),
-                cafeDto.getAddress(),
-                cafeDto.getPhoneNumber(),
-                cafeDto.getWebsiteUrl()
-        );
+        Cafe cafe = Cafe.builder()
+                .kakaoPlaceId(cafeDto.getKakaoPlaceId())
+                .cafeName(cafeDto.getCafeName())
+                .latitude(cafeDto.getLatitude())
+                .longitude(cafeDto.getLongitude())
+                .address(cafeDto.getAddress())
+                .phoneNumber(cafeDto.getPhoneNumber())
+                .websiteUrl(cafeDto.getWebsiteUrl())
+                .openingHours(cafeDto.getOpeningHours())
+                .photoUrl(cafeDto.getPhotoUrl())
+                .build();
 
         return cafeRepository.save(cafe);
     }
