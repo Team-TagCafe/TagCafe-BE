@@ -20,6 +20,7 @@ public class CafeDto {
     private String phoneNumber;
     private String websiteUrl;
     private LocalDateTime updateAt;
+    private double averageRating;
 
     private CafeAttributes.WifiSpeed wifi;
     private CafeAttributes.OutletAvailability outlets;

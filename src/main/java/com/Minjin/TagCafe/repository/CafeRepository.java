@@ -24,6 +24,6 @@ public interface CafeRepository extends JpaRepository<Cafe,Long> {
     List<Cafe> findByLatitudeBetweenAndLongitudeBetween(double minLat, double maxLat, double minLng, double maxLng);
 
     // 특정 평점 이상인 카페 조회
-    @Query("SELECT c FROM Cafe c WHERE c.averageGrade >= :minGrade")
-    List<Cafe> findByAverageGrade(@Param("minGrade") double minGrade);
+    @Query("SELECT c FROM Cafe c WHERE c.averageRating >= :minRating")
+    List<Cafe> findByAverageRating(@Param("minRating") double minRating);
 }

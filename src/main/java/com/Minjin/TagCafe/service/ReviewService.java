@@ -42,6 +42,14 @@ public class ReviewService {
                 .build();
 
         reviewRepository.save(review);
+
+        Double avgRating = reviewRepository.findAverageRatingByCafe(cafe);
+        if (avgRating != null) {
+            cafe.setAverageRating(avgRating);
+            cafeRepository.save(cafe);
+        }
+
+        updateCafeTags(cafe);
     }
 
     public List<Review> getReviewsByCafeId(Long cafeId) {
@@ -92,16 +100,66 @@ public class ReviewService {
         review.setParking(dto.getParking());
 
         reviewRepository.save(review);
+
+        Cafe cafe = review.getCafe();
+        Double avgRating = reviewRepository.findAverageRatingByCafe(cafe);
+        if (avgRating != null) {
+            cafe.setAverageRating(avgRating);
+            cafeRepository.save(cafe);
+        }
+
+        updateCafeTags(cafe);
     }
 
     @Transactional
     public void deleteReview(Long reviewId) {
-        if (!reviewRepository.existsById(reviewId)) {
-            throw new IllegalArgumentException("해당 리뷰가 존재하지 않습니다.");
-        }
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 리뷰가 존재하지 않습니다."));
+
+        Cafe cafe = review.getCafe();
         reviewRepository.deleteById(reviewId);
+
+        Double avgRating = reviewRepository.findAverageRatingByCafe(cafe);
+        cafe.setAverageRating(avgRating != null ? avgRating : 0.0); // 리뷰 전부 삭제되었을 경우 0.0으로 처리
+        cafeRepository.save(cafe);
+
+        updateCafeTags(cafe);
     }
 
+    // 태그 최빈값 계산
+    private <T> T getMostFrequentValue(List<T> values) {
+        return values.stream()
+                .collect(Collectors.groupingBy(v -> v, Collectors.counting()))
+                .entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse(null); // 없으면 null
+    }
+
+    // Cafe 태그값 업데이트
+    private void updateCafeTags(Cafe cafe) {
+        List<Review> reviews = reviewRepository.findByCafe_CafeId(cafe.getCafeId());
+
+        if (reviews.isEmpty()) return;
+
+        cafe.setWifi(getMostFrequentValue(
+                reviews.stream().map(Review::getWifi).collect(Collectors.toList()))
+        );
+        cafe.setOutlets(getMostFrequentValue(
+                reviews.stream().map(Review::getOutlets).collect(Collectors.toList()))
+        );
+        cafe.setDesk(getMostFrequentValue(
+                reviews.stream().map(Review::getDesk).collect(Collectors.toList()))
+        );
+        cafe.setRestroom(getMostFrequentValue(
+                reviews.stream().map(Review::getRestroom).collect(Collectors.toList()))
+        );
+        cafe.setParking(getMostFrequentValue(
+                reviews.stream().map(Review::getParking).collect(Collectors.toList()))
+        );
+
+        cafeRepository.save(cafe);
+    }
 
     public List<ReviewDTO> getReviewsWithFilter(String userEmail, List<String> tagNames, List<String> values) {
         List<Review> reviews = reviewRepository.findByUserEmail(userEmail);
