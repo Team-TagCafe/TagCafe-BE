@@ -26,11 +26,35 @@ public class ReportedCafeController {
         return ResponseEntity.ok("제보 완료");
     }
 
-    @GetMapping("/{userEmail}")
+    @GetMapping("/user/{userEmail}")
     public ResponseEntity<List<ReportedCafe>> getReportsByUser(@PathVariable("userEmail") String userEmail) {
         List<ReportedCafe> reports = reportedCafeService.getReportsByUser(userEmail);
         return ResponseEntity.ok(reports);
     }
+    @GetMapping("/{id}")
+    public ResponseEntity<ReportedCafe> getReportedCafe(@PathVariable("id") Long id) {
+        ReportedCafe report = reportedCafeRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 제보가 존재하지 않습니다."));
+        return ResponseEntity.ok(report);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<String> updateReportedCafe(@PathVariable("id") Long id, @RequestBody ReportedCafe updated) {
+        ReportedCafe report = reportedCafeRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 제보가 존재하지 않습니다."));
+
+        // 업데이트할 필드 설정
+        report.setWifi(updated.getWifi());
+        report.setOutlets(updated.getOutlets());
+        report.setDesk(updated.getDesk());
+        report.setRestroom(updated.getRestroom());
+        report.setParking(updated.getParking());
+        report.setContent(updated.getContent());
+
+        reportedCafeRepository.save(report);
+        return ResponseEntity.ok("제보가 수정되었습니다.");
+    }
+
 
     //관리자기능
     //미승인 제보목록조회
