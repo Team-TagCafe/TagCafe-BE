@@ -29,7 +29,7 @@ public class ReviewController {
     }
 
     @GetMapping("/{cafeId}")
-    public ResponseEntity<List<Review>> getReviewsByCafe(@PathVariable("cafeId") Long cafeId) {
+    public ResponseEntity<List<ReviewDTO>> getReviewsByCafe(@PathVariable("cafeId") Long cafeId) {
         return ResponseEntity.ok(reviewService.getReviewsByCafeId(cafeId));
     }
 }
