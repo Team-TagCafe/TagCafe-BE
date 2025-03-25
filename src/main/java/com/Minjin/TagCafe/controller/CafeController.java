@@ -12,10 +12,8 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/cafes")
@@ -29,6 +27,9 @@ public class CafeController {
     @GetMapping("/{cafeId}")
     public ResponseEntity<CafeDto> getCafeById(@PathVariable("cafeId") Long cafeId) {
         Cafe cafe = cafeService.getCafeById(cafeId);
+        List<String> base64Images = cafe.getImages().stream()
+                .map(image -> Base64.getEncoder().encodeToString(image.getImageData()))
+                .collect(Collectors.toList());
         CafeDto cafeDto = new CafeDto(
                 cafe.getCafeId(),
                 cafe.getKakaoPlaceId(),
@@ -41,12 +42,13 @@ public class CafeController {
                 cafe.getUpdateAt(),
                 cafe.getAverageRating(),
                 cafe.getOpeningHours(),
-                cafe.getPhotoUrl(),
                 cafe.getWifi(),
                 cafe.getOutlets(),
                 cafe.getDesk(),
                 cafe.getRestroom(),
-                cafe.getParking()
+                cafe.getParking(),
+                null,
+                base64Images
         );
         return ResponseEntity.ok(cafeDto);
     }

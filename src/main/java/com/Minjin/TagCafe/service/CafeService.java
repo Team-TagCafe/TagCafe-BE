@@ -1,6 +1,8 @@
 package com.Minjin.TagCafe.service;
 
 import com.Minjin.TagCafe.entity.Cafe;
+import com.Minjin.TagCafe.entity.CafeImage;
+import com.Minjin.TagCafe.repository.CafeImageRepository;
 import com.Minjin.TagCafe.repository.CafeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -8,8 +10,14 @@ import com.Minjin.TagCafe.dto.CafeDto;
 import com.Minjin.TagCafe.entity.Review;
 import com.Minjin.TagCafe.repository.ReviewRepository;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -19,6 +27,7 @@ import java.util.stream.Stream;
 public class CafeService {
     private final CafeRepository cafeRepository;
     private final ReviewRepository reviewRepository;
+    private final CafeImageRepository cafeImageRepository;
 
     // ID로 카페 조회
     public Cafe getCafeById(Long cafeId) {
@@ -198,8 +207,24 @@ public class CafeService {
                 .phoneNumber(cafeDto.getPhoneNumber())
                 .websiteUrl(cafeDto.getWebsiteUrl())
                 .openingHours(cafeDto.getOpeningHours())
-                .photoUrl(cafeDto.getPhotoUrl())
                 .build();
+
+        cafe.setImages(new ArrayList<>());
+        cafeRepository.save(cafe);
+
+        List<String> imageUrls = cafeDto.getPhotoUrls();
+        if (imageUrls != null) {
+            imageUrls.stream().limit(5).forEach(url -> {
+                System.out.println("📸 이미지 URL 확인: " + url);
+                byte[] imageData = fetchImageAsBytes(url);
+                System.out.println("📏 이미지 크기: " + imageData.length + " 바이트");
+                CafeImage image = CafeImage.builder()
+                        .imageData(imageData)
+                        .cafe(cafe)
+                        .build();
+                cafe.getImages().add(image);
+            });
+        }
 
         return cafeRepository.save(cafe);
     }
@@ -207,5 +232,31 @@ public class CafeService {
     public List<Cafe> getAllCafes() {
         return cafeRepository.findAll();
     }
+
+    private byte[] fetchImageAsBytes(String imageUrl) {
+        if (imageUrl == null || imageUrl.contains("undefined")) {
+            throw new RuntimeException("잘못된 이미지 URL: " + imageUrl);
+        }
+
+        try {
+            URL url = new URL(imageUrl);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestProperty("User-Agent", "Mozilla/5.0"); // ✅ 요게 핵심!
+
+            try (InputStream in = conn.getInputStream();
+                 ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+                byte[] buffer = new byte[1024];
+                int n;
+                while ((n = in.read(buffer)) != -1) {
+                    out.write(buffer, 0, n);
+                }
+                return out.toByteArray();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("이미지 다운로드 실패: " + imageUrl, e);
+        }
+    }
+
+
 
 }

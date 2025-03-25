@@ -4,6 +4,7 @@ import com.Minjin.TagCafe.entity.enums.CafeAttributes;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Getter
@@ -22,11 +23,14 @@ public class CafeDto {
     private LocalDateTime updateAt;
     private double averageRating;
     private String openingHours;
-    private String photoUrl;
 
     private CafeAttributes.WifiSpeed wifi;
     private CafeAttributes.OutletAvailability outlets;
     private CafeAttributes.DeskSize desk;
     private CafeAttributes.RestroomAvailability restroom;
     private CafeAttributes.ParkingAvailability parking;
+
+    private List<String> photoUrls;
+    private List<String> imageBase64List;
+
 }

@@ -6,6 +6,7 @@ import lombok.*;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 @Entity
 @Table(name = "Cafe",
@@ -39,9 +40,6 @@ public class Cafe {
     private String phoneNumber;
     private String websiteUrl;
 
-    @Column(length = 1000)
-    private String photoUrl;
-
     @UpdateTimestamp
     private LocalDateTime updateAt;
 
@@ -67,6 +65,9 @@ public class Cafe {
     @Enumerated(EnumType.STRING)
     @Column
     private CafeAttributes.ParkingAvailability parking;
+
+    @OneToMany(mappedBy = "cafe", cascade = CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<CafeImage> images = new ArrayList<>();
 
 
     public Cafe(Long kakaoPlaceId, String cafeName, double latitude, double longitude, String address, String phoneNumber, String websiteUrl) {
