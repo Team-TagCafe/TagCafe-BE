@@ -55,6 +55,15 @@ public class ReportedCafeController {
         return ResponseEntity.ok("제보가 수정되었습니다.");
     }
 
+    //이미있는 카페인지 확인
+    @GetMapping("/cafes/kakao/{kakaoPlaceId}")
+    public ResponseEntity<Cafe> getCafeByKakaoPlaceId(@PathVariable("kakaoPlaceId") Long kakaoPlaceId) {
+        return cafeRepository.findByKakaoPlaceId(kakaoPlaceId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+
 
     //관리자기능
     //미승인 제보목록조회
