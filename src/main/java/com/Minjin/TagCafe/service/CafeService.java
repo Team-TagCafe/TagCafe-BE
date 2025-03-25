@@ -65,8 +65,12 @@ public class CafeService {
         for (String line : lines) {
             if (!line.startsWith(todayKor)) continue;
 
+            if (line.contains("휴무일")) {
+                return false;
+            }
+
             if (line.contains("24시간 영업")) {
-                return true; // 항상 영업중
+                return true;
             }
 
             String[] parts = line.split(": ");
@@ -81,7 +85,6 @@ public class CafeService {
 
             return nowTime.isAfter(start) && nowTime.isBefore(end);
         }
-
         return false;
     }
 
