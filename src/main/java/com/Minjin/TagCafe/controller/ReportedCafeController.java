@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -57,10 +58,10 @@ public class ReportedCafeController {
 
     //이미있는 카페인지 확인
     @GetMapping("/cafes/kakao/{kakaoPlaceId}")
-    public ResponseEntity<Cafe> getCafeByKakaoPlaceId(@PathVariable("kakaoPlaceId") Long kakaoPlaceId) {
+    public ResponseEntity<?> getCafeByKakaoPlaceId(@PathVariable("kakaoPlaceId") Long kakaoPlaceId) {
         return cafeRepository.findByKakaoPlaceId(kakaoPlaceId)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .<ResponseEntity<?>>map(ResponseEntity::ok)
+                .orElse(ResponseEntity.ok().body(Map.of("exists", false)));
     }
 
 
