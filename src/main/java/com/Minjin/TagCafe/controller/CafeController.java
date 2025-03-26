@@ -11,8 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -61,7 +59,13 @@ public class CafeController {
         List<Cafe> cafes = cafeService.searchCafeByKeyword(query);
 
         List<CafeSearchDTO> dtos = cafes.stream()
-                .map(cafe -> new CafeSearchDTO(cafe.getCafeId(), cafe.getCafeName(), cafe.getAddress()))
+                .map(cafe -> new CafeSearchDTO(
+                        cafe.getCafeId(),
+                        cafe.getCafeName(),
+                        cafe.getAddress(),
+                        cafe.getLatitude(),
+                        cafe.getLongitude()
+                ))
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(dtos);

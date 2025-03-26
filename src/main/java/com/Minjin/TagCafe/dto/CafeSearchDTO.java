@@ -11,5 +11,7 @@ public class CafeSearchDTO {
     private Long cafeId;
     private String cafeName;
     private String address;
+    private double latitude;
+    private double longitude;
 
 }
