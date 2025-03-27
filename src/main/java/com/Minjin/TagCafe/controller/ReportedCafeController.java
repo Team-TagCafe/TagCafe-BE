@@ -1,14 +1,20 @@
 package com.Minjin.TagCafe.controller;
 
 import com.Minjin.TagCafe.entity.ReportedCafe;
+import com.Minjin.TagCafe.entity.Review;
+import com.Minjin.TagCafe.entity.User;
 import com.Minjin.TagCafe.repository.ReportedCafeRepository;
+import com.Minjin.TagCafe.repository.ReviewRepository;
+import com.Minjin.TagCafe.repository.UserRepository;
 import com.Minjin.TagCafe.service.ReportedCafeService;
 import com.Minjin.TagCafe.entity.Cafe;
 import com.Minjin.TagCafe.repository.CafeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +26,8 @@ public class ReportedCafeController {
     private final ReportedCafeService reportedCafeService;
     private final ReportedCafeRepository reportedCafeRepository;
     private final CafeRepository cafeRepository;
+    private final UserRepository userRepository;
+    private final ReviewRepository reviewRepository;
 
     @PostMapping
     public ResponseEntity<String> reportCafe(@RequestBody ReportedCafe reportedCafe) {
@@ -106,6 +114,23 @@ public class ReportedCafeController {
 
         report.setCafe(cafe); // Cafe 객체를 ReportedCafe에 연결
         reportedCafeRepository.save(report); // 다시 저장
+
+        User user = userRepository.findByEmail(report.getUserEmail())
+                .orElseThrow(() -> new UsernameNotFoundException("사용자 없음"));
+
+        Review review = new Review();
+        review.setCafe(cafe);
+        review.setUserEmail(user.getUserEmail());
+        review.setContent(report.getContent());
+        review.setCreatedAt(LocalDateTime.now());
+        review.setWifi(report.getWifi());
+        review.setOutlets(report.getOutlets());
+        review.setDesk(report.getDesk());
+        review.setRestroom(report.getRestroom());
+        review.setParking(report.getParking());
+        review.setRating(0); // 기본 별점 설정
+
+        reviewRepository.save(review);
 
         return ResponseEntity.ok("승인되었습니다.");
     }
