@@ -212,8 +212,20 @@ public class ReviewService {
             case "콘센트" -> review.getOutlets() != null && review.getOutlets().name().equals(value);
             case "책상" -> review.getDesk() != null && review.getDesk().name().equals(value);
             case "화장실" -> review.getRestroom() != null && review.getRestroom().name().equals(value);
-            case "주차" -> review.getParking() != null && review.getParking().name().equals(value);
+            case "주차" ->
+                    review.getParking() != null && getParkingDisplayValue(review.getParking().name()).equals(value);
             default -> false;
+        };
+    }
+
+
+    private String getParkingDisplayValue(String rawValue) {
+        return switch (rawValue) {
+            case "가능_무료" -> "가능(무료)";
+            case "가능_유료" -> "가능(유료)";
+            case "가능_일부" -> "가능(일부)";
+            case "불가능" -> "불가능";
+            default -> rawValue;
         };
     }
 }
