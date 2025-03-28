@@ -80,4 +80,14 @@ public class MyController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("리뷰 삭제 실패");
         }
     }
+    @GetMapping("/reviews/filter")
+    public ResponseEntity<List<ReviewDTO>> getReviewsByCafeWithFilter(
+            @RequestParam("userEmail") String userEmail,
+            @RequestParam(value = "tags", required = false) List<String> tagNames,
+            @RequestParam(value = "values", required = false) List<String> values) {
+
+        return ResponseEntity.ok(reviewService.getReviewsWithFilter(userEmail, tagNames, values));
+    }
+
+
 }

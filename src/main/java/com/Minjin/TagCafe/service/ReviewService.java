@@ -8,6 +8,8 @@ import com.Minjin.TagCafe.repository.ReviewRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -157,4 +159,71 @@ public class ReviewService {
         cafeRepository.save(cafe);
     }
 
+    public List<ReviewDTO> getReviewsWithFilter(String userEmail, List<String> tagNames, List<String> values) {
+        List<Review> reviews = reviewRepository.findByUserEmail(userEmail);
+
+        if (tagNames == null) tagNames = new ArrayList<>();
+        if (values == null) values = new ArrayList<>();
+
+        // 🔹 평점 필터 적용
+        boolean hasGradeFilter = tagNames.contains("평점");
+        if (hasGradeFilter) {
+            int index = tagNames.indexOf("평점");
+            String gradeFilter = values.get(index);
+
+            final double minGrade = switch (gradeFilter) {
+                case "5.0" -> 5.0;
+                case "4.0 이상" -> 4.0;
+                case "3.0 이상" -> 3.0;
+                default -> 0.0;
+            };
+
+            tagNames.remove(index);
+            values.remove(index);
+
+            reviews = reviews.stream()
+                    .filter(review -> review.getRating() >= minGrade)
+                    .collect(Collectors.toList());
+        }
+
+        // 🔹 카페 옵션(와이파이, 콘센트 등) 필터 적용
+        for (int i = 0; i < tagNames.size(); i++) {
+            String tagName = tagNames.get(i);
+            String value = values.get(i);
+
+            final String filterValue = value;
+            reviews = reviews.stream()
+                    .filter(review -> reviewMatchesTag(review, tagName, filterValue))
+                    .collect(Collectors.toList());
+        }
+
+        return reviews.stream()
+                .map(ReviewDTO::new)
+                .collect(Collectors.toList());
+    }
+
+    private boolean reviewMatchesTag(Review review, String tagName, String value) {
+        if (value == null || tagName == null) return false; // 값이 없으면 필터링 불가능
+
+        return switch (tagName) {
+            case "와이파이" -> review.getWifi() != null && review.getWifi().name().equals(value);
+            case "콘센트" -> review.getOutlets() != null && review.getOutlets().name().equals(value);
+            case "책상" -> review.getDesk() != null && review.getDesk().name().equals(value);
+            case "화장실" -> review.getRestroom() != null && review.getRestroom().name().equals(value);
+            case "주차" ->
+                    review.getParking() != null && getParkingDisplayValue(review.getParking().name()).equals(value);
+            default -> false;
+        };
+    }
+
+
+    private String getParkingDisplayValue(String rawValue) {
+        return switch (rawValue) {
+            case "가능_무료" -> "가능(무료)";
+            case "가능_유료" -> "가능(유료)";
+            case "가능_일부" -> "가능(일부)";
+            case "불가능" -> "불가능";
+            default -> rawValue;
+        };
+    }
 }
