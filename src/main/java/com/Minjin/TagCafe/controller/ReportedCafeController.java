@@ -1,6 +1,7 @@
 package com.Minjin.TagCafe.controller;
 
 import com.Minjin.TagCafe.dto.PhotoUrlsRequest;
+import com.Minjin.TagCafe.dto.ReportedCafeDTO;
 import com.Minjin.TagCafe.entity.*;
 import com.Minjin.TagCafe.repository.ReportedCafeRepository;
 import com.Minjin.TagCafe.repository.ReviewRepository;
@@ -37,9 +38,12 @@ public class ReportedCafeController {
     }
 
     @GetMapping("/user/{userEmail}")
-    public ResponseEntity<List<ReportedCafe>> getReportsByUser(@PathVariable("userEmail") String userEmail) {
+    public ResponseEntity<List<ReportedCafeDTO>> getReportsByUser(@PathVariable("userEmail") String userEmail) {
         List<ReportedCafe> reports = reportedCafeService.getReportsByUser(userEmail);
-        return ResponseEntity.ok(reports);
+        List<ReportedCafeDTO> dtos = reports.stream()
+                .map(ReportedCafeDTO::fromEntity)
+                .toList();
+        return ResponseEntity.ok(dtos);
     }
     @GetMapping("/{id}")
     public ResponseEntity<ReportedCafe> getReportedCafe(@PathVariable("id") Long id) {
@@ -85,9 +89,13 @@ public class ReportedCafeController {
 
     // 모든 제보 목록 조회
     @GetMapping("/admin/all")
-    public ResponseEntity<List<ReportedCafe>> getAllReports() {
-        List<ReportedCafe> allReports = reportedCafeRepository.findAll();
-        return ResponseEntity.ok(allReports);
+    public ResponseEntity<List<ReportedCafeDTO>> getAllReports() {
+        List<ReportedCafe> reports = reportedCafeRepository.findAll();
+        List<ReportedCafeDTO> dtos = reports.stream()
+                .map(ReportedCafeDTO::fromEntity)
+                .toList();
+
+        return ResponseEntity.ok(dtos);
     }
     //제보 승인
     @PostMapping("/admin/approve/{id}")
