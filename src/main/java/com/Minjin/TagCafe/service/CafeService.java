@@ -236,7 +236,7 @@ public class CafeService {
         return cafeRepository.findAll();
     }
 
-    private byte[] fetchImageAsBytes(String imageUrl) {
+    public byte[] fetchImageAsBytes(String imageUrl) {
         if (imageUrl == null || imageUrl.contains("undefined")) {
             throw new RuntimeException("잘못된 이미지 URL: " + imageUrl);
         }

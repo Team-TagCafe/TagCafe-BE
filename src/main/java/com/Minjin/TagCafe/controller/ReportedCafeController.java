@@ -1,13 +1,12 @@
 package com.Minjin.TagCafe.controller;
 
-import com.Minjin.TagCafe.entity.ReportedCafe;
-import com.Minjin.TagCafe.entity.Review;
-import com.Minjin.TagCafe.entity.User;
+import com.Minjin.TagCafe.dto.PhotoUrlsRequest;
+import com.Minjin.TagCafe.entity.*;
 import com.Minjin.TagCafe.repository.ReportedCafeRepository;
 import com.Minjin.TagCafe.repository.ReviewRepository;
 import com.Minjin.TagCafe.repository.UserRepository;
+import com.Minjin.TagCafe.service.CafeService;
 import com.Minjin.TagCafe.service.ReportedCafeService;
-import com.Minjin.TagCafe.entity.Cafe;
 import com.Minjin.TagCafe.repository.CafeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,6 +28,7 @@ public class ReportedCafeController {
     private final CafeRepository cafeRepository;
     private final UserRepository userRepository;
     private final ReviewRepository reviewRepository;
+    private final CafeService cafeService;
 
     @PostMapping
     public ResponseEntity<String> reportCafe(@RequestBody ReportedCafe reportedCafe) {
@@ -90,11 +91,11 @@ public class ReportedCafeController {
     }
     //제보 승인
     @PostMapping("/admin/approve/{id}")
-    public ResponseEntity<String> approveReport(@PathVariable("id") Long id) {
+    public ResponseEntity<String> approveReport(@PathVariable("id") Long id,
+                                                @RequestBody(required = false) PhotoUrlsRequest photoUrlsRequest) {
         ReportedCafe report = reportedCafeRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 제보가 존재하지 않습니다."));
         report.setStatus(ReportedCafe.ReportStatus.APPROVED);
-        reportedCafeRepository.save(report);
 
         Cafe cafe = new Cafe();
         cafe.setCafeName(report.getCafeName());
@@ -110,10 +111,24 @@ public class ReportedCafeController {
         cafe.setRestroom(report.getRestroom());
         cafe.setParking(report.getParking());
         cafe.setKakaoPlaceId(Long.valueOf(report.getKakaoPlaceId()));
-        cafeRepository.save(cafe);
 
-        report.setCafe(cafe); // Cafe 객체를 ReportedCafe에 연결
-        reportedCafeRepository.save(report); // 다시 저장
+        // 이미지 저장
+        if (photoUrlsRequest != null && photoUrlsRequest.getPhotoUrls() != null) {
+            List<CafeImage> images = photoUrlsRequest.getPhotoUrls().stream().limit(5)
+                    .map(url -> {
+                        byte[] imageData = cafeService.fetchImageAsBytes(url);
+                        return CafeImage.builder()
+                                .imageData(imageData)
+                                .cafe(cafe)
+                                .build();
+                    }).collect(Collectors.toList());
+
+            cafe.setImages(images);
+        }
+
+        cafeRepository.save(cafe);
+        report.setCafe(cafe);
+        reportedCafeRepository.save(report);
 
         User user = userRepository.findByEmail(report.getUserEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("사용자 없음"));
