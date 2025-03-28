@@ -32,6 +32,8 @@ public class ReportedCafe {
 
     private String kakaoPlaceId;
 
+    private String googlePlaceId;
+
     private Double latitude;
 
     private Double longitude;
