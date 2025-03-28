@@ -6,7 +6,6 @@ import lombok.*;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(name = "Cafe",
@@ -44,7 +43,7 @@ public class Cafe {
     private LocalDateTime updateAt;
 
     @Column(nullable = false)
-    private double averageGrade = 0.0; // 기본값 0.0
+    private double averageRating = 0.0; // 기본값 0.0
 
     @Enumerated(EnumType.STRING)
     @Column
@@ -76,6 +75,6 @@ public class Cafe {
         this.phoneNumber = phoneNumber;
         this.websiteUrl = websiteUrl;
         this.updateAt = LocalDateTime.now(); // 자동으로 현재 시간 설정
-        this.averageGrade = 0.0; // 기본값 설정
+        this.averageRating = 0.0; // 기본값 설정
     }
 }

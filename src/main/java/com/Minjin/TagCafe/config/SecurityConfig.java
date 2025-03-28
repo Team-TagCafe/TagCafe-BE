@@ -29,6 +29,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // ✅ Preflight 요청 허용
                         .requestMatchers("/faq/**").permitAll()
                         .requestMatchers("/my/**").permitAll()
+                        .requestMatchers("/report/**").permitAll()
 
                         //.anyRequest().authenticated()
                         .anyRequest().permitAll() // 모든 요청 허용

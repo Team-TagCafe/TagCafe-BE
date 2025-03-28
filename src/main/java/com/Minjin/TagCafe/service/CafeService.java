@@ -40,12 +40,12 @@ public class CafeService {
         List<Cafe> filteredCafes = cafeRepository.findAll(); // 기본적으로 모든 카페 가져오기
 
         // 평점 필터 확인 및 처리
-        boolean hasGradeFilter = tagNames.contains("평점");
-        if (hasGradeFilter) {
+        boolean hasRatingFilter = tagNames.contains("평점");
+        if (hasRatingFilter) {
             int index = tagNames.indexOf("평점");
-            String gradeFilter = values.get(index);
+            String ratingFilter = values.get(index);
 
-            final double minGrade = switch (gradeFilter) {
+            final double minRating = switch (ratingFilter) {
                 case "5.0" -> 5.0;
                 case "4.0 이상" -> 4.0;
                 case "3.0 이상" -> 3.0;
@@ -58,7 +58,7 @@ public class CafeService {
 
             // 평균 평점이 기준 이상인 카페 필터링
             filteredCafes = filteredCafes.stream()
-                    .filter(cafe -> cafe.getAverageGrade() >= minGrade)
+                    .filter(cafe -> cafe.getAverageRating() >= minRating)
                     .collect(Collectors.toList());
         }
 
