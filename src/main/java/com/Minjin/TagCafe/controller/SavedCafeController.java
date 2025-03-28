@@ -1,6 +1,7 @@
 package com.Minjin.TagCafe.controller;
 
 import com.Minjin.TagCafe.dto.SavedCafeDTO;
+import com.Minjin.TagCafe.entity.Cafe;
 import com.Minjin.TagCafe.entity.SavedCafe;
 import com.Minjin.TagCafe.service.SavedCafeService;
 import lombok.RequiredArgsConstructor;
@@ -33,11 +34,15 @@ public class SavedCafeController {
 
     // 방문여부 업데이트
     @PatchMapping("/{cafeId}/visited")
-    public ResponseEntity<SavedCafe> toggleVisited(
+    public ResponseEntity<SavedCafeDTO> toggleVisited(
             @RequestParam("userId") Long userId,
             @PathVariable("cafeId") Long cafeId) {
 
-        return ResponseEntity.ok(savedCafeService.toggleVisitedStatus(userId, cafeId));
+        SavedCafe savedCafe = savedCafeService.toggleVisitedStatus(userId, cafeId);
+        Cafe cafe = savedCafe.getCafe();
+        Boolean visited = savedCafe.getVisited();
+
+        return ResponseEntity.ok(new SavedCafeDTO(cafe, visited));
     }
 
     // 저장한 카페 목록 + 필터링 적용
