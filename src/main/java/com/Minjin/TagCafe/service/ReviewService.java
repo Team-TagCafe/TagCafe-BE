@@ -198,7 +198,10 @@ public class ReviewService {
         }
 
         return reviews.stream()
-                .map(ReviewDTO::new)
+                .map(review -> {
+                    String nickname = userService.getNicknameByEmail(review.getUserEmail());
+                    return new ReviewDTO(review, nickname);
+                })
                 .collect(Collectors.toList());
     }
 
