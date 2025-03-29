@@ -1,26 +1,19 @@
 package com.Minjin.TagCafe.dto;
 
 import com.Minjin.TagCafe.entity.enums.CafeAttributes;
-import lombok.*;
-
-import java.time.LocalDateTime;
-import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CafeDto {
+public class CafeHomeDTO {
     private Long cafeId;
-    private Long kakaoPlaceId;
     private String cafeName;
     private double latitude;
     private double longitude;
     private String address;
-    private String phoneNumber;
-    private String websiteUrl;
-    private LocalDateTime updateAt;
     private double averageRating;
     private String openingHours;
 
@@ -30,7 +23,5 @@ public class CafeDto {
     private CafeAttributes.RestroomAvailability restroom;
     private CafeAttributes.ParkingAvailability parking;
 
-    private List<String> photoUrls;
-    private List<String> imageBase64List;
-
+    private String thumbnailImageBase64;  // 대표 이미지 1장
 }

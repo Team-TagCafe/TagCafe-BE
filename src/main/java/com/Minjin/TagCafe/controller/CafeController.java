@@ -1,6 +1,8 @@
 package com.Minjin.TagCafe.controller;
 
 import com.Minjin.TagCafe.dto.CafeDto;
+import com.Minjin.TagCafe.dto.CafeHomeDTO;
+import com.Minjin.TagCafe.dto.CafeSearchDTO;
 import com.Minjin.TagCafe.entity.Cafe;
 import com.Minjin.TagCafe.repository.CafeRepository;
 import com.Minjin.TagCafe.service.CafeService;
@@ -9,13 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/cafes")
@@ -29,6 +27,9 @@ public class CafeController {
     @GetMapping("/{cafeId}")
     public ResponseEntity<CafeDto> getCafeById(@PathVariable("cafeId") Long cafeId) {
         Cafe cafe = cafeService.getCafeById(cafeId);
+        List<String> base64Images = cafe.getImages().stream()
+                .map(image -> Base64.getEncoder().encodeToString(image.getImageData()))
+                .collect(Collectors.toList());
         CafeDto cafeDto = new CafeDto(
                 cafe.getCafeId(),
                 cafe.getKakaoPlaceId(),
@@ -40,34 +41,72 @@ public class CafeController {
                 cafe.getWebsiteUrl(),
                 cafe.getUpdateAt(),
                 cafe.getAverageRating(),
+                cafe.getOpeningHours(),
                 cafe.getWifi(),
                 cafe.getOutlets(),
                 cafe.getDesk(),
                 cafe.getRestroom(),
-                cafe.getParking()
+                cafe.getParking(),
+                null,
+                base64Images
         );
         return ResponseEntity.ok(cafeDto);
     }
 
     // 검색
     @GetMapping("/search")
-    public ResponseEntity<List<Cafe>> searchCafe(@RequestParam(name = "query") String query) {
-        return ResponseEntity.ok(cafeService.searchCafeByKeyword(query));
+    public ResponseEntity<List<CafeSearchDTO>> searchCafe(@RequestParam(name = "query") String query) {
+        List<Cafe> cafes = cafeService.searchCafeByKeyword(query);
+
+        List<CafeSearchDTO> dtos = cafes.stream()
+                .map(cafe -> new CafeSearchDTO(
+                        cafe.getCafeId(),
+                        cafe.getCafeName(),
+                        cafe.getAddress(),
+                        cafe.getLatitude(),
+                        cafe.getLongitude()
+                ))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(dtos);
     }
 
     // 지도 영역 내 카페 조회 (위경도 범위 내 검색)
     @GetMapping("/area")
-    public ResponseEntity<List<Cafe>> getCafesInArea(@RequestParam(name = "minLat") double minLat,
-                                                     @RequestParam(name = "maxLat") double maxLat,
-                                                     @RequestParam(name = "minLng") double minLng,
-                                                     @RequestParam(name = "maxLng") double maxLng) {
+    public ResponseEntity<List<CafeHomeDTO>> getCafesInArea(@RequestParam(name = "minLat") double minLat,
+                                                            @RequestParam(name = "maxLat") double maxLat,
+                                                            @RequestParam(name = "minLng") double minLng,
+                                                            @RequestParam(name = "maxLng") double maxLng) {
         List<Cafe> cafes = cafeService.getCafesInArea(minLat, maxLat, minLng, maxLng);
-        return ResponseEntity.ok(cafes);
+
+        List<CafeHomeDTO> dtos = cafes.stream()
+                .map(cafe -> {
+                    String imageBase64 = cafe.getImages().isEmpty() ? null
+                            : Base64.getEncoder().encodeToString(cafe.getImages().get(0).getImageData());
+                    return new CafeHomeDTO(
+                            cafe.getCafeId(),
+                            cafe.getCafeName(),
+                            cafe.getLatitude(),
+                            cafe.getLongitude(),
+                            cafe.getAddress(),
+                            cafe.getAverageRating(),
+                            cafe.getOpeningHours(),
+                            cafe.getWifi(),
+                            cafe.getOutlets(),
+                            cafe.getDesk(),
+                            cafe.getRestroom(),
+                            cafe.getParking(),
+                            imageBase64
+                    );
+                })
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(dtos);
     }
 
     // 특정 태그와 특정 값을 가진 카페 조회
     @GetMapping("/filter")
-    public ResponseEntity<List<Cafe>> getCafesByMultipleTags(@RequestParam(name = "tagNames") List<String> tagNames,
+    public ResponseEntity<List<CafeHomeDTO>> getCafesByMultipleTags(@RequestParam(name = "tagNames") List<String> tagNames,
                                                              @RequestParam(name = "values") List<String> values) {
         if (tagNames.size() != values.size()) {
             return ResponseEntity.badRequest().build();
@@ -85,7 +124,30 @@ public class CafeController {
         }
 
         List<Cafe> cafes = cafeService.getCafesByMultipleTagsAndValues(tagNames, values);
-        return ResponseEntity.ok(cafes);
+
+        List<CafeHomeDTO> dtos = cafes.stream().map(cafe -> {
+            String imageBase64 = cafe.getImages() != null && !cafe.getImages().isEmpty()
+                    ? Base64.getEncoder().encodeToString(cafe.getImages().get(0).getImageData())
+                    : null;
+
+            return new CafeHomeDTO(
+                    cafe.getCafeId(),
+                    cafe.getCafeName(),
+                    cafe.getLatitude(),
+                    cafe.getLongitude(),
+                    cafe.getAddress(),
+                    cafe.getAverageRating(),
+                    cafe.getOpeningHours(),
+                    cafe.getWifi(),
+                    cafe.getOutlets(),
+                    cafe.getDesk(),
+                    cafe.getRestroom(),
+                    cafe.getParking(),
+                    imageBase64
+            );
+        }).collect(Collectors.toList());
+
+        return ResponseEntity.ok(dtos);
     }
 
 

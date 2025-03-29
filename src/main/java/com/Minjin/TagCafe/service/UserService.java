@@ -30,4 +30,12 @@ public class UserService {
         // ✅ JWT 생성 후 반환
         return jwtUtil.generateToken(user.getEmail());
     }
+
+    // 이메일로 닉네임 조회
+    public String getNicknameByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .map(User::getNickname)
+                .orElse("알 수 없음");
+    }
+
 }

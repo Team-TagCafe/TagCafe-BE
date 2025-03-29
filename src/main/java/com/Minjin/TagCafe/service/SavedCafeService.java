@@ -11,6 +11,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -70,6 +72,57 @@ public class SavedCafeService {
         return savedCafeRepository.save(savedCafe);
     }
 
+    // 필터링
+    private boolean isOpenNow(String openingHours) {
+        if (openingHours == null || openingHours.isEmpty() || openingHours.equals("정보 없음")) return false;
+
+        String[] lines = openingHours.split(", ");
+        LocalDateTime now = LocalDateTime.now();
+        String todayKor = switch (now.getDayOfWeek()) {
+            case MONDAY -> "월요일";
+            case TUESDAY -> "화요일";
+            case WEDNESDAY -> "수요일";
+            case THURSDAY -> "목요일";
+            case FRIDAY -> "금요일";
+            case SATURDAY -> "토요일";
+            case SUNDAY -> "일요일";
+        };
+
+        for (String line : lines) {
+            if (!line.startsWith(todayKor)) continue;
+
+            if (line.contains("24시간 영업")) return true;
+
+            String[] parts = line.split(": ");
+            if (parts.length < 2) return false;
+
+            String[] times = parts[1].split(" ~ ");
+            if (times.length < 2) return false;
+
+            LocalTime start = parseKoreanTime(times[0]);
+            LocalTime end = parseKoreanTime(times[1]);
+
+            LocalTime nowTime = now.toLocalTime();
+            return nowTime.isAfter(start) && nowTime.isBefore(end);
+        }
+
+        return false;
+    }
+
+    private LocalTime parseKoreanTime(String timeStr) {
+        boolean isPM = timeStr.contains("오후");
+        timeStr = timeStr.replace("오전", "").replace("오후", "").trim();
+        String[] parts = timeStr.split(":");
+        int hour = Integer.parseInt(parts[0].trim());
+        int minute = Integer.parseInt(parts[1].trim());
+
+        if (isPM && hour != 12) hour += 12;
+        if (!isPM && hour == 12) hour = 0;
+
+        return LocalTime.of(hour, minute);
+    }
+
+
     public List<SavedCafeDTO> getSavedCafesWithFilter(Long userId, List<String> tagNames, List<String> values) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
@@ -103,6 +156,30 @@ public class SavedCafeService {
                     .filter(cafe -> cafe.getAverageRating() >= minGrade)
                     .collect(Collectors.toList());
         }
+
+        for (int i = 0; i < tagNames.size(); i++) {
+            String tagName = tagNames.get(i);
+            String value = values.get(i);
+
+            if ("운영시간".equals(tagName)) {
+                if ("영업중".equals(value)) {
+                    savedCafes = savedCafes.stream()
+                            .filter(cafe -> isOpenNow(cafe.getOpeningHours()))
+                            .collect(Collectors.toList());
+                } else if ("24시간".equals(value)) {
+                    savedCafes = savedCafes.stream()
+                            .filter(cafe -> cafe.getOpeningHours() != null &&
+                                    cafe.getOpeningHours().contains("24시간 영업"))
+                            .collect(Collectors.toList());
+                }
+
+                // 이 필터는 이미 처리했으므로 리스트에서 제거
+                tagNames.remove(i);
+                values.remove(i);
+                i--; // 인덱스 보정
+            }
+        }
+
 
         // 태그 필터 적용 (Cafe 엔티티 필드 기반)
         for (int i = 0; i < tagNames.size(); i++) {

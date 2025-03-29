@@ -18,10 +18,12 @@ import java.util.stream.Collectors;
 public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final CafeRepository cafeRepository;
+    private final UserService userService;
 
-    public ReviewService(ReviewRepository reviewRepository, CafeRepository cafeRepository) {
+    public ReviewService(ReviewRepository reviewRepository, CafeRepository cafeRepository, UserService userService) {
         this.reviewRepository = reviewRepository;
         this.cafeRepository = cafeRepository;
+        this.userService = userService;
     }
 
     @Transactional
@@ -52,38 +54,34 @@ public class ReviewService {
         updateCafeTags(cafe);
     }
 
-    public List<Review> getReviewsByCafeId(Long cafeId) {
-        return reviewRepository.findByCafe_CafeId(cafeId);
+    public List<ReviewDTO> getReviewsByCafeId(Long cafeId) {
+        List<Review> reviews = reviewRepository.findByCafe_CafeId(cafeId);
+
+        return reviews.stream().map(review -> {
+            String nickname = userService.getNicknameByEmail(review.getUserEmail());
+            return new ReviewDTO(review, nickname);
+        }).collect(Collectors.toList());
     }
 
     public List<ReviewDTO> getReviewsByUser(String userEmail) {
         List<Review> reviews = reviewRepository.findByUserEmail(userEmail);
+        String nickname = userService.getNicknameByEmail(userEmail);
 
         return reviews.stream().map(review -> {
             Cafe cafe = review.getCafe();  //Review에서 직접 Cafe 객체 가져오기
             String cafeName = (cafe != null) ? cafe.getCafeName() : "알 수 없는 카페";
 
-            return new ReviewDTO(
-                    review.getId(),
-                    review.getCafe().getCafeId(),
-                    cafeName,
-                    review.getUserEmail(),
-                    review.getRating(),
-                    review.getContent(),
-                    review.getWifi(),
-                    review.getOutlets(),
-                    review.getDesk(),
-                    review.getRestroom(),
-                    review.getParking(),
-                    review.getCreatedAt()
-            );
+            ReviewDTO dto = new ReviewDTO(review, nickname);
+            dto.setCafeName(cafeName);
+            return dto;
         }).collect(Collectors.toList());
     }
 
     public ReviewDTO getReviewById(Long reviewId) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 리뷰가 존재하지 않습니다."));
-        return new ReviewDTO(review);
+        String nickname = userService.getNicknameByEmail(review.getUserEmail());
+        return new ReviewDTO(review, nickname);
     }
 
     @Transactional
@@ -200,7 +198,10 @@ public class ReviewService {
         }
 
         return reviews.stream()
-                .map(ReviewDTO::new)
+                .map(review -> {
+                    String nickname = userService.getNicknameByEmail(review.getUserEmail());
+                    return new ReviewDTO(review, nickname);
+                })
                 .collect(Collectors.toList());
     }
 
