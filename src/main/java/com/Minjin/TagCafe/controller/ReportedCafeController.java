@@ -151,7 +151,7 @@ public class ReportedCafeController {
         review.setDesk(report.getDesk());
         review.setRestroom(report.getRestroom());
         review.setParking(report.getParking());
-        review.setRating(0); // 기본 별점 설정
+        review.setRating(report.getRating());
 
         reviewRepository.save(review);
 

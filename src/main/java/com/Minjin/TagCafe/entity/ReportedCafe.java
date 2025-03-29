@@ -26,6 +26,9 @@ public class ReportedCafe {
     @Column(nullable = false)
     private String userEmail;
 
+    @Column(nullable = false)
+    private int rating;
+
     private String cafeName;
 
     private String address;

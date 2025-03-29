@@ -21,6 +21,8 @@ public class ReportedCafeDTO {
     private String content;
     private String status;
     private Long cafeId;
+    private int rating;
+
 
     public static ReportedCafeDTO fromEntity(ReportedCafe report) {
         return ReportedCafeDTO.builder()
@@ -37,6 +39,7 @@ public class ReportedCafeDTO {
                 .content(report.getContent())
                 .status(report.getStatus().name())
                 .cafeId(report.getCafe() != null ? report.getCafe().getCafeId() : null)
+                .rating(report.getRating())
                 .build();
     }
 
