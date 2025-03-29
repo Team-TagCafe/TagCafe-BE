@@ -64,6 +64,7 @@ public class ReportedCafeController {
         report.setRestroom(updated.getRestroom());
         report.setParking(updated.getParking());
         report.setContent(updated.getContent());
+        report.setRating(updated.getRating());
 
         reportedCafeRepository.save(report);
         return ResponseEntity.ok("제보가 수정되었습니다.");
