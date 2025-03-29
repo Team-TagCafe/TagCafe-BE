@@ -155,6 +155,12 @@ public class ReportedCafeController {
 
         reviewRepository.save(review);
 
+        Double avgRating = reviewRepository.findAverageRatingByCafe(cafe);
+        if (avgRating != null) {
+            cafe.setAverageRating(avgRating);
+            cafeRepository.save(cafe);
+        }
+
         return ResponseEntity.ok("승인되었습니다.");
     }
 
