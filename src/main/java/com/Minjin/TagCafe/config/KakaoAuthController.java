@@ -6,6 +6,7 @@ import com.Minjin.TagCafe.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -28,7 +29,12 @@ public class KakaoAuthController {
 
     private static final Logger logger = LoggerFactory.getLogger(KakaoAuthController.class);
 
-    private final KakaoConfig kakaoConfig;
+    @Value("${kakao.client-id}")
+    private String kakaoClientId;
+
+    @Value("${kakao.redirect-uri}")
+    private String kakaoRedirectUri;
+
     private final RestTemplate restTemplate = new RestTemplate();
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
@@ -37,8 +43,8 @@ public class KakaoAuthController {
     public RedirectView kakaoLogin() {
         String kakaoAuthUrl = "https://kauth.kakao.com/oauth/authorize"
                 + "?response_type=code"
-                + "&client_id=" + kakaoConfig.getClientId()
-                + "&redirect_uri=" + kakaoConfig.getRedirectUri()
+                + "&client_id=" + kakaoClientId
+                + "&redirect_uri=" + kakaoRedirectUri
                 + "&scope=profile_nickname,profile_image,account_email";
 
         return new RedirectView(kakaoAuthUrl);
@@ -57,8 +63,8 @@ public class KakaoAuthController {
         // 2. 요청 Body 설정
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
-        params.add("client_id", kakaoConfig.getClientId());
-        params.add("redirect_uri", kakaoConfig.getRedirectUri());
+        params.add("client_id", kakaoClientId);
+        params.add("redirect_uri", kakaoRedirectUri);
         params.add("code", code);
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
