@@ -15,7 +15,7 @@ import java.util.Date;
 public class JwtUtil {
     private final SecretKey key;
     private final long EXPIRATION_TIME = 1000 * 60 * 60 * 24; // 24시간
-    public JwtUtil(@Value("${security.jwt.secret}") String secretKey) {
+    public JwtUtil(@Value("#{systemEnvironment['SECURITY_JWT_SECRET'] ?: systemProperties['security.jwt.secret']}") String secretKey) {
         this.key = Keys.hmacShaKeyFor(secretKey.getBytes());
     }
     // ✅ JWT 생성
