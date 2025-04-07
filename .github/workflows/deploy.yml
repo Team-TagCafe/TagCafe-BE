@@ -30,7 +30,43 @@ jobs:
       - name: Create application.yml
         run: |
           mkdir -p src/main/resources
-          ... # (application.yml 생성 내용 동일)
+          echo "spring:" > src/main/resources/application.yml
+          echo "  datasource:" >> src/main/resources/application.yml
+          echo "    url: ${{ secrets.DB_URL }}" >> src/main/resources/application.yml
+          echo "    username: ${{ secrets.DB_USERNAME }}" >> src/main/resources/application.yml
+          echo "    password: ${{ secrets.DB_PASSWORD }}" >> src/main/resources/application.yml
+          echo "    driver-class-name: com.mysql.cj.jdbc.Driver" >> src/main/resources/application.yml
+          echo "  jpa:" >> src/main/resources/application.yml
+          echo "    hibernate:" >> src/main/resources/application.yml
+          echo "      ddl-auto: update" >> src/main/resources/application.yml
+          echo "    show-sql: true" >> src/main/resources/application.yml
+          echo "    properties:" >> src/main/resources/application.yml
+          echo "      hibernate:" >> src/main/resources/application.yml
+          echo "        format_sql: true" >> src/main/resources/application.yml
+          echo "        dialect: org.hibernate.dialect.MySQL8Dialect" >> src/main/resources/application.yml
+          echo "  security:" >> src/main/resources/application.yml
+          echo "    jwt:" >> src/main/resources/application.yml
+          echo "      secret: ${{ secrets.SECURITY_JWT_SECRET }}" >> src/main/resources/application.yml
+          echo "    oauth2:" >> src/main/resources/application.yml
+          echo "      client:" >> src/main/resources/application.yml
+          echo "        registration:" >> src/main/resources/application.yml
+          echo "          kakao:" >> src/main/resources/application.yml
+          echo "            client-id: ${{ secrets.KAKAO_CLIENT_ID }}" >> src/main/resources/application.yml
+          echo "            redirect-uri: ${{ secrets.KAKAO_REDIRECT_URI }}" >> src/main/resources/application.yml
+          echo "            authorization-grant-type: authorization_code" >> src/main/resources/application.yml
+          echo "            client-authentication-method: client_secret_post" >> src/main/resources/application.yml
+          echo "            scope: profile_nickname, profile_image, account_email" >> src/main/resources/application.yml
+          echo "        provider:" >> src/main/resources/application.yml
+          echo "          kakao:" >> src/main/resources/application.yml
+          echo "            authorization-uri: https://kauth.kakao.com/oauth/authorize" >> src/main/resources/application.yml
+          echo "            token-uri: https://kauth.kakao.com/oauth/token" >> src/main/resources/application.yml
+          echo "            user-info-uri: https://kapi.kakao.com/v2/user/me" >> src/main/resources/application.yml
+          echo "            user-name-attribute: id" >> src/main/resources/application.yml
+          echo "logging:" >> src/main/resources/application.yml
+          echo "  level:" >> src/main/resources/application.yml
+          echo "    root: DEBUG" >> src/main/resources/application.yml
+          echo "    org.springframework: DEBUG" >> src/main/resources/application.yml
+          echo "    com.Minjin.TagCafe: DEBUG" >> src/main/resources/application.yml
 
       - name: Build jar
         run: ./gradlew clean bootJar -x test
