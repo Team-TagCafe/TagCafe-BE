@@ -102,6 +102,7 @@ jobs:
           script: |
             pkill -f 'jar' || true
             cd /home/ec2-user/app
+            export $(grep -v '^#' .env | xargs)
             nohup java \
               -DKAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }} \
               -DKAKAO_REDIRECT_URI=${{ secrets.KAKAO_REDIRECT_URI }} \
