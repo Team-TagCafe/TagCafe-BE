@@ -12,13 +12,13 @@ import lombok.Getter;
 public class KakaoConfig {
     private static final Logger logger = LoggerFactory.getLogger(KakaoConfig.class);
 
-    @Value("${kakao.client_id}")
+    @Value("${KAKAO_CLIENT_ID}")
     private String clientId;
 
-    @Value("${kakao.redirect_uri}")
+    @Value("${KAKAO_REDIRECT_URI}")
     private String redirectUri;
 
-    @Value("${security.jwt.secret}")
+    @Value("${SECURITY_JWT_SECRET}")
     private String jwtSecret;
 
 }
