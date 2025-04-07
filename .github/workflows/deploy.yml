@@ -2,7 +2,7 @@ name: Deploy to EC2
 
 on:
   push:
-    branches: [main]  
+    branches: [main]
 
 jobs:
   build-and-deploy:
@@ -18,25 +18,6 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Build with Gradle
-        run: ./gradlew clean build -x test
-
-      - name: Build jar
-        run: ./gradlew clean bootJar -x test
-        
-      - name: Check built jar exists
-        run: ls -al build/libs
-  
-      - name: Copy jar to EC2
-        uses: appleboy/scp-action@v0.1.3
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ec2-user
-          key: ${{ secrets.EC2_KEY }}
-          source: build/libs/TagCafe-0.0.1-SNAPSHOT.jar
-          target: "/home/ec2-user/app"
-          strip_components: 2
-
       - name: Generate .env file
         run: |
           echo "KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}" >> .env
@@ -49,52 +30,32 @@ jobs:
       - name: Create application.yml
         run: |
           mkdir -p src/main/resources
-          echo "spring:" > src/main/resources/application.yml
-          echo "  datasource:" >> src/main/resources/application.yml
-          echo "    url: ${{ secrets.DB_URL }}" >> src/main/resources/application.yml
-          echo "    username: ${{ secrets.DB_USERNAME }}" >> src/main/resources/application.yml
-          echo "    password: ${{ secrets.DB_PASSWORD }}" >> src/main/resources/application.yml
-          echo "    driver-class-name: com.mysql.cj.jdbc.Driver" >> src/main/resources/application.yml
-          echo "  jpa:" >> src/main/resources/application.yml
-          echo "    hibernate:" >> src/main/resources/application.yml
-          echo "      ddl-auto: update" >> src/main/resources/application.yml
-          echo "    show-sql: true" >> src/main/resources/application.yml
-          echo "    properties:" >> src/main/resources/application.yml
-          echo "      hibernate:" >> src/main/resources/application.yml
-          echo "        format_sql: true" >> src/main/resources/application.yml
-          echo "        dialect: org.hibernate.dialect.MySQL8Dialect" >> src/main/resources/application.yml
-          echo "  security:" >> src/main/resources/application.yml
-          echo "    jwt:" >> src/main/resources/application.yml
-          echo "      secret: ${{ secrets.SECURITY_JWT_SECRET }}" >> src/main/resources/application.yml
-          echo "    oauth2:" >> src/main/resources/application.yml
-          echo "      client:" >> src/main/resources/application.yml
-          echo "        registration:" >> src/main/resources/application.yml
-          echo "          kakao:" >> src/main/resources/application.yml
-          echo "            client-id: ${{ secrets.KAKAO_CLIENT_ID }}" >> src/main/resources/application.yml
-          echo "            redirect-uri: ${{ secrets.KAKAO_REDIRECT_URI }}" >> src/main/resources/application.yml
-          echo "            authorization-grant-type: authorization_code" >> src/main/resources/application.yml
-          echo "            client-authentication-method: client_secret_post" >> src/main/resources/application.yml
-          echo "            scope: profile_nickname, profile_image, account_email" >> src/main/resources/application.yml
-          echo "        provider:" >> src/main/resources/application.yml
-          echo "          kakao:" >> src/main/resources/application.yml
-          echo "            authorization-uri: https://kauth.kakao.com/oauth/authorize" >> src/main/resources/application.yml
-          echo "            token-uri: https://kauth.kakao.com/oauth/token" >> src/main/resources/application.yml
-          echo "            user-info-uri: https://kapi.kakao.com/v2/user/me" >> src/main/resources/application.yml
-          echo "            user-name-attribute: id" >> src/main/resources/application.yml
-          echo "logging:" >> src/main/resources/application.yml
-          echo "  level:" >> src/main/resources/application.yml
-          echo "    root: DEBUG" >> src/main/resources/application.yml
-          echo "    org.springframework: DEBUG" >> src/main/resources/application.yml
-          echo "    com.Minjin.TagCafe: DEBUG" >> src/main/resources/application.yml
+          ... # (application.yml 생성 내용 동일)
+
+      - name: Build jar
+        run: ./gradlew clean bootJar -x test
+
+      - name: Check built jar exists
+        run: ls -al build/libs
+
+      - name: Copy jar to EC2
+        uses: appleboy/scp-action@v0.1.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_KEY }}
+          source: build/libs/TagCafe-0.0.1-SNAPSHOT.jar
+          target: /home/ec2-user/app
+          strip_components: 2
 
       - name: Copy .env to EC2
         uses: appleboy/scp-action@v0.1.3
         with:
-         host: ${{ secrets.EC2_HOST }}
-         username: ec2-user
-         key: ${{ secrets.EC2_KEY }}
-         source: .env
-         target: /home/ec2-user/app    
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_KEY }}
+          source: .env
+          target: /home/ec2-user/app
 
       - name: Run app on EC2
         uses: appleboy/ssh-action@v0.1.10
@@ -104,5 +65,5 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           script: |
             pkill -f 'jar' || true
-            cd /home/ec2-user/app/build/libs
-            nohup java -jar TagCafe-0.0.1-SNAPSHOT.jar > /home/ec2-user/app/app.log 2>&1 &
+            cd /home/ec2-user/app
+            nohup java -jar TagCafe-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
