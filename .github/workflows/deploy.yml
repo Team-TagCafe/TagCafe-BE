@@ -21,6 +21,12 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew clean build -x test
 
+      - name: Build jar
+        run: ./gradlew clean bootJar -x test
+        
+      - name: Check built jar exists
+        run: ls -al build/libs
+  
       - name: Copy jar to EC2
         uses: appleboy/scp-action@v0.1.3
         with:
