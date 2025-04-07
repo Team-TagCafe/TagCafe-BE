@@ -102,4 +102,7 @@ jobs:
           script: |
             pkill -f 'jar' || true
             cd /home/ec2-user/app
-            nohup java -jar TagCafe-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
+            export KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}
+            export KAKAO_REDIRECT_URI=${{ secrets.KAKAO_REDIRECT_URI }}
+            export SECURITY_JWT_SECRET=${{ secrets.SECURITY_JWT_SECRET }}
+            nohup java -jar TagCafe-0.0.1-SNAPSHOT.jar > app.log 2>&1 & -jar TagCafe-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
