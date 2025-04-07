@@ -102,10 +102,11 @@ jobs:
           script: |
             pkill -f 'jar' || true
             cd /home/ec2-user/app
-            export DB_URL=${{ secrets.DB_URL }}
-            export DB_USERNAME=${{ secrets.DB_USERNAME }}
-            export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-            export KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}
-            export KAKAO_REDIRECT_URI=${{ secrets.KAKAO_REDIRECT_URI }}
-            export SECURITY_JWT_SECRET=${{ secrets.SECURITY_JWT_SECRET }}
-            nohup java -jar TagCafe-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
+            nohup java \
+              -Dspring.datasource.url=${{ secrets.DB_URL }} \
+              -Dspring.datasource.username=${{ secrets.DB_USERNAME }} \
+              -Dspring.datasource.password=${{ secrets.DB_PASSWORD }} \
+              -Dsecurity.jwt.secret=${{ secrets.SECURITY_JWT_SECRET }} \
+              -Dkakao.client-id=${{ secrets.KAKAO_CLIENT_ID }} \
+              -Dkakao.redirect-uri=${{ secrets.KAKAO_REDIRECT_URI }} \
+              -jar TagCafe-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
