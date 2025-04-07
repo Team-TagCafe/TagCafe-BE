@@ -105,4 +105,7 @@ jobs:
             export KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}
             export KAKAO_REDIRECT_URI=${{ secrets.KAKAO_REDIRECT_URI }}
             export SECURITY_JWT_SECRET=${{ secrets.SECURITY_JWT_SECRET }}
-            nohup java -jar TagCafe-0.0.1-SNAPSHOT.jar > app.log 2>&1 & -jar TagCafe-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
+            export DB_URL=${{ secrets.DB_URL }}
+            export DB_USERNAME=${{ secrets.DB_USERNAME }}
+            export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            nohup java -jar TagCafe-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
