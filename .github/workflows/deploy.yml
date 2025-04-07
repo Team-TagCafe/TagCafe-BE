@@ -104,6 +104,7 @@ jobs:
             cd /home/ec2-user/app
             export $(grep -v '^#' .env | xargs)
             nohup java \
+              -Dspring.profiles.active=default \
               -DKAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }} \
               -DKAKAO_REDIRECT_URI=${{ secrets.KAKAO_REDIRECT_URI }} \
               -DSECURITY_JWT_SECRET=${{ secrets.SECURITY_JWT_SECRET }} \
