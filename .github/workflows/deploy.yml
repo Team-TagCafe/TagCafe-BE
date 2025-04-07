@@ -1,0 +1,41 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches: [main]  # 원하는 브랜치명 사용
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build with Gradle
+        run: ./gradlew clean build
+
+      - name: Copy jar to EC2
+        uses: appleboy/scp-action@v0.1.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_KEY }}
+          source: "build/libs/*.jar"
+          target: "/home/ec2-user/app"
+
+      - name: Run app on EC2
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            pkill -f 'jar' || true
+            nohup java -jar /home/ec2-user/app/*.jar > app.log 2>&1 &
