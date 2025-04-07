@@ -33,7 +33,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ec2-user
           key: ${{ secrets.EC2_KEY }}
-          source: "build/libs/*.jar"
+          source: build/libs/TagCafe-0.0.1-SNAPSHOT.jar
           target: "/home/ec2-user/app"
 
       - name: Run app on EC2
