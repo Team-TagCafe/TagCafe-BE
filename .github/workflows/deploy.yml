@@ -32,4 +32,4 @@ jobs:
             chmod +x gradlew
             ./gradlew clean build -x test
             docker-compose down
-            docker-compose up --build -d</file>
+            docker-compose up --build -d
