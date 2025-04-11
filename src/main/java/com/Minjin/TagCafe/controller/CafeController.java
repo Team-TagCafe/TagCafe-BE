@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/cafes")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "https://localhost:3000") // React에서 API 호출 허용
+@CrossOrigin(origins = "https://tagcafe.site") // React에서 API 호출 허용
 public class CafeController {
     private final CafeService cafeService;
     private final CafeRepository cafeRepository;

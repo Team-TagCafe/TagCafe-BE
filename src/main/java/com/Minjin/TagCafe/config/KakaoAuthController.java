@@ -65,13 +65,13 @@ public class KakaoAuthController {
         ResponseEntity<Map> tokenResponse = restTemplate.exchange(tokenUrl, HttpMethod.POST, request, Map.class);
 
         if (tokenResponse.getBody() == null) {
-            return new RedirectView("http://localhost:3000/error?message=카카오 토큰 발급 실패");
+            return new RedirectView("https://tagcafe.site/error?message=카카오 토큰 발급 실패");
         }
 
         String accessToken = (String) tokenResponse.getBody().get("access_token");
 
         if (accessToken == null) {
-            return new RedirectView("http://localhost:3000/error?message=액세스 토큰 발급 실패");
+            return new RedirectView("https://tagcafe.site/error?message=액세스 토큰 발급 실패");
         }
 
         // ✅ 4. 사용자 정보 요청
@@ -82,7 +82,7 @@ public class KakaoAuthController {
         ResponseEntity<Map> userInfoResponse = restTemplate.exchange(userInfoUrl, HttpMethod.GET, entity, Map.class);
 
         if (userInfoResponse.getBody() == null) {
-            return new RedirectView("http://localhost:3000/error?message=카카오 사용자 정보 가져오기 실패");
+            return new RedirectView("https://tagcafe.site/error?message=카카오 사용자 정보 가져오기 실패");
         }
 
         Map<String, Object> kakaoAccount = (Map<String, Object>) userInfoResponse.getBody().get("kakao_account");
@@ -114,7 +114,7 @@ public class KakaoAuthController {
         String jwtToken = jwtUtil.generateToken(user.getEmail());
 
         // ✅ 8. 프론트엔드로 리다이렉트 (닉네임은 DB에서 가져온 최신값)
-        return new RedirectView("http://localhost:3000/home?nickname=" + URLEncoder.encode(user.getNickname(), StandardCharsets.UTF_8)
+        return new RedirectView("https://tagcafe.site/home?nickname=" + URLEncoder.encode(user.getNickname(), StandardCharsets.UTF_8)
                 + "&email=" + email
                 + "&token=" + jwtToken);
     }

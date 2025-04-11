@@ -8,6 +8,6 @@ import org.springframework.web.servlet.view.RedirectView;
 public class HomeController {
     @GetMapping("/")
     public RedirectView redirectToFrontend() {
-        return new RedirectView("http://localhost:3000");
+        return new RedirectView("https://tagcafe.site");
     }
 }

@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/faq")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://tagcafe.site")
 public class FAQController {
 
     private final FeedbackRepository feedbackRepository;

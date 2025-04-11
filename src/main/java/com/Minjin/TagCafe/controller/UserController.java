@@ -20,7 +20,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+@CrossOrigin(origins = "https://tagcafe.site", allowCredentials = "true")
 public class UserController {
     private final UserRepository userRepository;
 
@@ -69,7 +69,7 @@ public class UserController {
             // ✅ 카카오 로그아웃 URL 반환
             Map<String, String> response = new HashMap<>();
             response.put("message", "회원 탈퇴 성공");
-            response.put("logoutUrl", "https://kauth.kakao.com/oauth/logout?client_id=" + kakaoClientId + "&logout_redirect_uri=http://localhost:3000");
+            response.put("logoutUrl", "https://kauth.kakao.com/oauth/logout?client_id=" + kakaoClientId + "&logout_redirect_uri=https://tagcafe.site");
 
             return ResponseEntity.ok(response);
         } else {
