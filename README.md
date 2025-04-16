@@ -12,7 +12,7 @@
 - 웹 서비스: [https://tagcafe.site](https://tagcafe.site)
 - Swagger API 문서: [https://tagcafe.site/swagger-ui/index.html](https://tagcafe.site/swagger-ui/index.html)
 
----
+<br>
 
 ## 🧑‍💻 역할
 
@@ -21,7 +21,7 @@
 | <div align="center"><a href="https://github.com/ghi512"><img src="https://avatars.githubusercontent.com/ghi512" width="100"/><br/>김민지</a></div> | 카페 검색 및 조회, 태그 필터링, 카페 저장 기능 개발<br/>Swagger를 활용한 전체 API 문서화    |
 | <div align="center"><a href="https://github.com/jjinleee"><img src="https://avatars.githubusercontent.com/jjinleee" width="100"/><br/>이진</a></div> | 회원 관리, 마이페이지(리뷰/제보) 기능 구현<br/>카카오 로그인 연동<br/>CI/CD 설정 및 배포 자동화 |
 
----
+<br>
 
 ## 🛠 기술 스택
 
@@ -40,7 +40,7 @@
 | 환경 변수   | dotenv-java 기반 `.env`, `application.yml` 에서 외부 주입        |
 | API 문서화  | Swagger (springdoc-openapi)     |
 
----
+<br>
 
 ## 📁 프로젝트 구조
 
@@ -55,3 +55,5 @@
 ┣ 📂 util                     # 공통 유틸 기능 (JWT)
 ┗ TagCafeApplication.java     # 메인 클래스
 ```
+
+
