@@ -3,6 +3,8 @@ package com.Minjin.TagCafe.controller;
 import com.Minjin.TagCafe.dto.NicknameRequest;
 import com.Minjin.TagCafe.entity.User;
 import com.Minjin.TagCafe.repository.UserRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+@Tag(name = "User", description = "사용자 정보 관리 및 탈퇴 API")
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
@@ -26,6 +29,8 @@ public class UserController {
 
     @Value("${kakao.client.id}")
     private String kakaoClientId;
+
+    @Operation(summary = "닉네임 변경", description = "사용자의 이메일을 기반으로 닉네임을 변경합니다.")
     @PutMapping("/nickname")
     public ResponseEntity<String> updateNickname(@RequestBody NicknameRequest request) {
         String email = request.getEmail();
@@ -42,6 +47,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("사용자를 찾을 수 없습니다");
     }
 
+    @Operation(summary = "회원 탈퇴", description = "이메일로 사용자를 삭제하고 세션 및 쿠키를 정리합니다.")
     @DeleteMapping("/delete")
     public ResponseEntity<Map<String, String>> deleteUser(@RequestParam("email") String email, HttpServletRequest req, HttpServletResponse res) {
         Optional<User> userOptional = userRepository.findByEmail(email);
@@ -77,6 +83,7 @@ public class UserController {
         }
     }
 
+    @Operation(summary = "유저 ID 조회", description = "이메일을 기반으로 유저 ID를 조회합니다.")
     @GetMapping("/id")
     public ResponseEntity<Long> getUserId(@RequestParam("email") String email) {
         Optional<User> user = userRepository.findByEmail(email);
