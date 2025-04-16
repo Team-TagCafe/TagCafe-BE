@@ -25,17 +25,20 @@
 
 ## 🛠 기술 스택
 
-| 항목 | 내용 |
-|------|------|
-| 언어 | Java 17 |
-| 프레임워크 | Spring Boot 3.4.2 |
-| ORM | Spring Data JPA |
-| 빌드 도구 | Gradle |
-| DB | MySQL 8.0 (AWS RDS) |
-| 인증 | Spring Security + Kakao OAuth + JWT |
-| 배포 | Docker |
-| API 문서화 | Swagger (springdoc-openapi) |
-| 환경 변수 | dotenv-java (.env) |
+| 항목        | 내용                                                             |
+|-------------|------------------------------------------------------------------|
+| 언어        | Java 17                                                          |
+| 프레임워크  | Spring Boot 3.4.2                                                |
+| ORM         | Spring Data JPA                                                  |
+| 빌드 도구   | Gradle                                                           |
+| DB          | MySQL 8.0 (AWS RDS)                                              |
+| 인증        | Spring Security + Kakao OAuth 2.0 + JWT                          |
+| 배포        | Docker + Docker Compose + NGINX                                  |
+| CI/CD       | GitHub Actions → EC2 자동 배포                                   |
+| 웹서버      | NGINX (React + API 리버스 프록시)                                |
+| 인증서      | Let’s Encrypt (HTTPS 인증서 적용)                                |
+| 환경 변수   | dotenv-java 기반 `.env`, `application.yml` 에서 외부 주입        |
+| API 문서화  | Swagger (springdoc-openapi)     |
 
 ---
 
