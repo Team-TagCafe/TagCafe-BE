@@ -6,6 +6,8 @@ import com.Minjin.TagCafe.dto.CafeSearchDTO;
 import com.Minjin.TagCafe.entity.Cafe;
 import com.Minjin.TagCafe.repository.CafeRepository;
 import com.Minjin.TagCafe.service.CafeService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Tag(name = "Cafe", description = "카페 정보 조회 및 필터 검색 API")
 @RestController
 @RequestMapping("/cafes")
 @RequiredArgsConstructor
@@ -24,6 +27,7 @@ public class CafeController {
     private final CafeRepository cafeRepository;
 
     // id로 카페 조회
+    @Operation(summary = "ID로 카페 조회", description = "카페 ID를 기반으로 카페 상세 정보를 조회합니다.")
     @GetMapping("/{cafeId}")
     public ResponseEntity<CafeDto> getCafeById(@PathVariable("cafeId") Long cafeId) {
         Cafe cafe = cafeService.getCafeById(cafeId);
@@ -54,6 +58,7 @@ public class CafeController {
     }
 
     // 검색
+    @Operation(summary = "카페 검색", description = "키워드로 카페를 검색합니다.")
     @GetMapping("/search")
     public ResponseEntity<List<CafeSearchDTO>> searchCafe(@RequestParam(name = "query") String query) {
         List<Cafe> cafes = cafeService.searchCafeByKeyword(query);
@@ -72,6 +77,7 @@ public class CafeController {
     }
 
     // 지도 영역 내 카페 조회 (위경도 범위 내 검색)
+    @Operation(summary = "지도의 특정 영역 내 카페 조회", description = "지도 상에서 특정 위경도 범위에 있는 카페 목록을 반환합니다.")
     @GetMapping("/area")
     public ResponseEntity<List<CafeHomeDTO>> getCafesInArea(@RequestParam(name = "minLat") double minLat,
                                                             @RequestParam(name = "maxLat") double maxLat,
@@ -105,6 +111,7 @@ public class CafeController {
     }
 
     // 특정 태그와 특정 값을 가진 카페 조회
+    @Operation(summary = "여러 태그 조건으로 카페 필터링", description = "태그 이름과 값들을 기준으로 카페를 필터링하여 조회합니다.")
     @GetMapping("/filter")
     public ResponseEntity<List<CafeHomeDTO>> getCafesByMultipleTags(@RequestParam(name = "tagNames") List<String> tagNames,
                                                              @RequestParam(name = "values") List<String> values) {
@@ -152,6 +159,7 @@ public class CafeController {
 
 
     // admin - 카페 검색 후 db 저장
+    @Operation(summary = "admin - 카페 저장", description = "관리자가 카페 정보를 저장합니다.")
     @PostMapping
     public ResponseEntity<?> addCafe(@RequestBody CafeDto cafeDto) {
         Cafe savedCafe = cafeService.addCafe(cafeDto);
@@ -159,6 +167,7 @@ public class CafeController {
     }
 
     // admin - 태그 값 업데이트
+    @Operation(summary = "admin - 카페 태그 수정", description = "특정 카페의 태그 정보(wifi, 책상 등)를 수정합니다.")
     @PutMapping("/{cafeId}/tags")
     public ResponseEntity<Cafe> updateCafeTags(@PathVariable("cafeId") Long cafeId,
                                                @RequestBody CafeDto cafeDto) {
@@ -176,12 +185,14 @@ public class CafeController {
     }
 
     // 모든 카페 조회 API 추가
+    @Operation(summary = "모든 카페 조회", description = "전체 카페 목록을 조회합니다.")
     @GetMapping
     public ResponseEntity<List<Cafe>> getAllCafes() {
         List<Cafe> cafes = cafeService.getAllCafes();
         return ResponseEntity.ok(cafes);
     }
 
+    @Operation(summary = "카페 태그 조회", description = "카페 ID를 기준으로 태그(wifi, 콘센트 등) 정보를 조회합니다.")
     @GetMapping("/{cafeId}/tags")
     public ResponseEntity<Map<String, String>> getCafeTags(@PathVariable("cafeId") Long cafeId) {
         Cafe cafe = cafeRepository.findById(cafeId)

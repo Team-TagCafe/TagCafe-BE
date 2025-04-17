@@ -3,6 +3,8 @@ package com.Minjin.TagCafe.config;
 import com.Minjin.TagCafe.entity.User;
 import com.Minjin.TagCafe.repository.UserRepository;
 import com.Minjin.TagCafe.util.JwtUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +23,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Optional;
 
+@Tag(name = "Auth", description = "카카오 로그인 및 사용자 인증 관련 API")
 @RestController
 @RequestMapping("/oauth/kakao")
 @RequiredArgsConstructor
@@ -33,6 +36,7 @@ public class KakaoAuthController {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
 
+    @Operation(summary = "카카오 로그인 시작", description = "카카오 로그인 인증 페이지로 리디렉션합니다.")
     @GetMapping("/login")
     public RedirectView kakaoLogin() {
         String kakaoAuthUrl = "https://kauth.kakao.com/oauth/authorize"
@@ -44,6 +48,7 @@ public class KakaoAuthController {
         return new RedirectView(kakaoAuthUrl);
     }
 
+    @Operation(summary = "카카오 로그인 콜백", description = "카카오 인증 후 사용자 정보를 받아옵니다.")
     @GetMapping("/callback")
     public RedirectView kakaoCallback(@RequestParam(name="code") String code) {
 
@@ -119,6 +124,7 @@ public class KakaoAuthController {
                 + "&token=" + jwtToken);
     }
 
+    @Operation(summary = "로그인한 사용자 정보 조회", description = "현재 로그인한 사용자의 정보를 반환합니다.")
     @GetMapping("/userinfo")
     public ResponseEntity<String> getUserInfo(@RequestParam("access_token") String accessToken) {
         String userInfoUrl = "https://kapi.kakao.com/v2/user/me";
