@@ -16,6 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -78,7 +80,8 @@ public class UserController {
             // ✅ 카카오 로그아웃 URL 반환
             Map<String, String> response = new HashMap<>();
             response.put("message", "회원 탈퇴 성공");
-            response.put("logoutUrl", "https://kauth.kakao.com/oauth/logout?client_id=" + kakaoClientId + "&logout_redirect_uri=https://tagcafe.site");
+            String encodedRedirectUri = URLEncoder.encode("https://tagcafe.site", StandardCharsets.UTF_8);
+            response.put("logoutUrl", "https://kauth.kakao.com/oauth/logout?client_id=" + kakaoClientId + "&logout_redirect_uri=" + encodedRedirectUri);
 
             return ResponseEntity.ok(response);
         } else {
