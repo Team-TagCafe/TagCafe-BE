@@ -2,6 +2,7 @@ package com.Minjin.TagCafe.controller;
 
 import com.Minjin.TagCafe.dto.NicknameRequest;
 import com.Minjin.TagCafe.entity.User;
+import com.Minjin.TagCafe.repository.SavedCafeRepository;
 import com.Minjin.TagCafe.repository.UserRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,6 +27,7 @@ import java.util.Optional;
 @CrossOrigin(origins = "https://tagcafe.site", allowCredentials = "true")
 public class UserController {
     private final UserRepository userRepository;
+    private final SavedCafeRepository savedCafeRepository;
 
     @Value("${kakao.client.id}")
     private String kakaoClientId;
@@ -53,6 +55,7 @@ public class UserController {
         Optional<User> userOptional = userRepository.findByEmail(email);
 
         if (userOptional.isPresent()) {
+            savedCafeRepository.deleteAll(savedCafeRepository.findByUser(userOptional.get()));
             userRepository.delete(userOptional.get());
 
             // ✅ 세션 무효화
