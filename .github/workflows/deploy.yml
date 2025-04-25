@@ -25,6 +25,7 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           source: "build/libs/TagCafe-0.0.1-SNAPSHOT.jar"
           target: "/home/ec2-user/app/"
+          overwrite: true
 
       - name: SSH into EC2 and deploy
         uses: appleboy/ssh-action@v0.1.10
