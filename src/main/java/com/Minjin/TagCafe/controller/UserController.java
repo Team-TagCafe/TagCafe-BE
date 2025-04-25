@@ -2,6 +2,7 @@ package com.Minjin.TagCafe.controller;
 
 import com.Minjin.TagCafe.dto.NicknameRequest;
 import com.Minjin.TagCafe.entity.User;
+import com.Minjin.TagCafe.repository.SavedCafeRepository;
 import com.Minjin.TagCafe.repository.UserRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,6 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -26,6 +29,7 @@ import java.util.Optional;
 @CrossOrigin(origins = "https://tagcafe.site", allowCredentials = "true")
 public class UserController {
     private final UserRepository userRepository;
+    private final SavedCafeRepository savedCafeRepository;
 
     @Value("${kakao.client.id}")
     private String kakaoClientId;
@@ -53,6 +57,7 @@ public class UserController {
         Optional<User> userOptional = userRepository.findByEmail(email);
 
         if (userOptional.isPresent()) {
+            savedCafeRepository.deleteAll(savedCafeRepository.findByUser(userOptional.get()));
             userRepository.delete(userOptional.get());
 
             // ✅ 세션 무효화
@@ -75,7 +80,8 @@ public class UserController {
             // ✅ 카카오 로그아웃 URL 반환
             Map<String, String> response = new HashMap<>();
             response.put("message", "회원 탈퇴 성공");
-            response.put("logoutUrl", "https://kauth.kakao.com/oauth/logout?client_id=" + kakaoClientId + "&logout_redirect_uri=https://tagcafe.site");
+            String encodedRedirectUri = URLEncoder.encode("https://tagcafe.site", StandardCharsets.UTF_8);
+            response.put("logoutUrl", "https://kauth.kakao.com/oauth/logout?client_id=" + kakaoClientId + "&logout_redirect_uri=" + encodedRedirectUri);
 
             return ResponseEntity.ok(response);
         } else {
