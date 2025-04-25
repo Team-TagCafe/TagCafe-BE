@@ -17,15 +17,11 @@ jobs:
       - name: Build JAR
         run: ./gradlew clean build -x test
 
-      - name: Copy JAR to EC2
-        uses: appleboy/scp-action@v0.1.3
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ec2-user
-          key: ${{ secrets.EC2_KEY }}
-          source: "build/libs/TagCafe-0.0.1-SNAPSHOT.jar"
-          target: "/home/ec2-user/app/"
-          overwrite: true
+      - name: Copy JAR to EC2 manually
+        run: |
+          echo "${{ secrets.EC2_KEY }}" > key.pem
+          chmod 600 key.pem
+          scp -i key.pem -o StrictHostKeyChecking=no build/libs/TagCafe-0.0.1-SNAPSHOT.jar ec2-user@${{ secrets.EC2_HOST }}:/home/ec2-user/app/
 
       - name: SSH into EC2 and deploy
         uses: appleboy/ssh-action@v0.1.10
