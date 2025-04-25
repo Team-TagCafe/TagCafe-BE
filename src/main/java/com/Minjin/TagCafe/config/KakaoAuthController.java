@@ -95,6 +95,10 @@ public class KakaoAuthController {
 
         String kakaoNickname = profile != null ? (String) profile.get("nickname") : "Unknown";
         String email = (String) kakaoAccount.get("email");
+        if (email == null || email.isBlank()) {
+            logger.error("❌ 이메일 정보가 없습니다. 카카오 계정에 이메일이 등록되어 있는지 확인하세요.");
+            return new RedirectView("https://tagcafe.site/error?message=이메일 정보를 가져올 수 없습니다.");
+        }
 
         logger.info("✅ 카카오 로그인 성공! 닉네임: {}, 이메일: {}", kakaoNickname, email);
 
