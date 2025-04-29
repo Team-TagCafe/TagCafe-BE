@@ -243,32 +243,6 @@ public class CafeService {
         return cafeRepository.findAll();
     }
 
-
-    // 이미지 바이너리로 저장 (삭제 예정)
-    public byte[] fetchImageAsBytes(String imageUrl) {
-        if (imageUrl == null || imageUrl.contains("undefined")) {
-            throw new RuntimeException("잘못된 이미지 URL: " + imageUrl);
-        }
-
-        try {
-            URL url = new URL(imageUrl);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestProperty("User-Agent", "Mozilla/5.0"); // ✅ 요게 핵심!
-
-            try (InputStream in = conn.getInputStream();
-                 ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-                byte[] buffer = new byte[1024];
-                int n;
-                while ((n = in.read(buffer)) != -1) {
-                    out.write(buffer, 0, n);
-                }
-                return out.toByteArray();
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("이미지 다운로드 실패: " + imageUrl, e);
-        }
-    }
-
     // 구글 사진 URL -> S3 업로드 메서드
     public String uploadImageToS3FromUrl(String imageUrl){
         try {
