@@ -22,6 +22,7 @@ public class ReviewDTO {
     private String userNickname;
     private int rating;
     private String content;
+    private String thumbnailImageUrl;
 
     private WifiSpeed wifi;
     private OutletAvailability outlets;
@@ -46,5 +47,10 @@ public class ReviewDTO {
         this.restroom = review.getRestroom();
         this.parking = review.getParking();
         this.createdAt = review.getCreatedAt();
+
+        Cafe cafe = review.getCafe();
+        this.thumbnailImageUrl = (cafe.getImages() != null && !cafe.getImages().isEmpty())
+                ? cafe.getImages().get(0).getImageUrl()
+                : null;
     }
 }
