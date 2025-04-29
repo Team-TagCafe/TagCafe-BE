@@ -4,7 +4,10 @@ import com.Minjin.TagCafe.entity.Cafe;
 import com.Minjin.TagCafe.entity.CafeImage;
 import com.Minjin.TagCafe.repository.CafeImageRepository;
 import com.Minjin.TagCafe.repository.CafeRepository;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.Minjin.TagCafe.dto.CafeDto;
 import com.Minjin.TagCafe.entity.Review;
@@ -19,6 +22,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -28,6 +32,10 @@ public class CafeService {
     private final CafeRepository cafeRepository;
     private final ReviewRepository reviewRepository;
     private final CafeImageRepository cafeImageRepository;
+    private final AmazonS3Client amazonS3Client;
+
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucket;
 
     // ID로 카페 조회
     public Cafe getCafeById(Long cafeId) {
@@ -236,6 +244,8 @@ public class CafeService {
         return cafeRepository.findAll();
     }
 
+
+    // 이미지 바이너리로 저장 (삭제 예정)
     public byte[] fetchImageAsBytes(String imageUrl) {
         if (imageUrl == null || imageUrl.contains("undefined")) {
             throw new RuntimeException("잘못된 이미지 URL: " + imageUrl);
@@ -260,6 +270,29 @@ public class CafeService {
         }
     }
 
+    // 구글 사진 URL -> S3 업로드 메서드
+    public String uploadImageToS3FromUrl(String imageUrl){
+        try {
+            URL url = new URL(imageUrl);
+            InputStream inputStream = url.openStream();
+            String fileName = "cafe-images/" + UUID.randomUUID() + ".jpg";
+
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentType("image/jpeg");
+
+            amazonS3Client.putObject(
+                    bucket,
+                    fileName,
+                    inputStream,
+                    metadata
+            );
+            return "https://" + bucket + ".s3.ap-northeast-2.amazonaws.com/" + fileName;
+
+        } catch (IOException e){
+            e.printStackTrace();
+            throw new RuntimeException("구글 이미지 다운로드 또는 S3 업로드 실패", e);
+        }
+    }
 
 
 }
