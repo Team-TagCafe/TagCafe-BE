@@ -13,5 +13,5 @@ public class CafeSearchDTO {
     private String address;
     private double latitude;
     private double longitude;
-
+    private String thumbnailImageUrl;
 }

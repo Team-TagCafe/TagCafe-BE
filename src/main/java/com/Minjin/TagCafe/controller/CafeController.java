@@ -65,13 +65,17 @@ public class CafeController {
         List<Cafe> cafes = cafeService.searchCafeByKeyword(query);
 
         List<CafeSearchDTO> dtos = cafes.stream()
-                .map(cafe -> new CafeSearchDTO(
-                        cafe.getCafeId(),
-                        cafe.getCafeName(),
-                        cafe.getAddress(),
-                        cafe.getLatitude(),
-                        cafe.getLongitude()
-                ))
+                .map(cafe -> {
+                    String thumbnail = cafe.getImages().isEmpty() ? null : cafe.getImages().get(0).getImageUrl();
+                    return new CafeSearchDTO(
+                            cafe.getCafeId(),
+                            cafe.getCafeName(),
+                            cafe.getAddress(),
+                            cafe.getLatitude(),
+                            cafe.getLongitude(),
+                            thumbnail
+                    );
+                })
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(dtos);
