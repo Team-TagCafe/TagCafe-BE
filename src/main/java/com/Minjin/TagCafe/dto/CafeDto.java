@@ -31,6 +31,6 @@ public class CafeDto {
     private CafeAttributes.ParkingAvailability parking;
 
     private List<String> photoUrls;
-    private List<String> imageBase64List;
+    private List<String> imageUrls;
 
 }

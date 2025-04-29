@@ -4,6 +4,7 @@ import com.Minjin.TagCafe.dto.CafeDto;
 import com.Minjin.TagCafe.dto.CafeHomeDTO;
 import com.Minjin.TagCafe.dto.CafeSearchDTO;
 import com.Minjin.TagCafe.entity.Cafe;
+import com.Minjin.TagCafe.entity.CafeImage;
 import com.Minjin.TagCafe.repository.CafeRepository;
 import com.Minjin.TagCafe.service.CafeService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,8 +32,8 @@ public class CafeController {
     @GetMapping("/{cafeId}")
     public ResponseEntity<CafeDto> getCafeById(@PathVariable("cafeId") Long cafeId) {
         Cafe cafe = cafeService.getCafeById(cafeId);
-        List<String> base64Images = cafe.getImages().stream()
-                .map(image -> Base64.getEncoder().encodeToString(image.getImageData()))
+        List<String> imageUrls = cafe.getImages().stream()
+                .map(CafeImage::getImageUrl)
                 .collect(Collectors.toList());
         CafeDto cafeDto = new CafeDto(
                 cafe.getCafeId(),
@@ -52,7 +53,7 @@ public class CafeController {
                 cafe.getRestroom(),
                 cafe.getParking(),
                 null,
-                base64Images
+                imageUrls
         );
         return ResponseEntity.ok(cafeDto);
     }
@@ -87,8 +88,8 @@ public class CafeController {
 
         List<CafeHomeDTO> dtos = cafes.stream()
                 .map(cafe -> {
-                    String imageBase64 = cafe.getImages().isEmpty() ? null
-                            : Base64.getEncoder().encodeToString(cafe.getImages().get(0).getImageData());
+                    String thumbnailImageUrl = cafe.getImages().isEmpty() ? null
+                            : cafe.getImages().get(0).getImageUrl();
                     return new CafeHomeDTO(
                             cafe.getCafeId(),
                             cafe.getCafeName(),
@@ -102,7 +103,7 @@ public class CafeController {
                             cafe.getDesk(),
                             cafe.getRestroom(),
                             cafe.getParking(),
-                            imageBase64
+                            thumbnailImageUrl
                     );
                 })
                 .collect(Collectors.toList());
@@ -133,9 +134,8 @@ public class CafeController {
         List<Cafe> cafes = cafeService.getCafesByMultipleTagsAndValues(tagNames, values);
 
         List<CafeHomeDTO> dtos = cafes.stream().map(cafe -> {
-            String imageBase64 = cafe.getImages() != null && !cafe.getImages().isEmpty()
-                    ? Base64.getEncoder().encodeToString(cafe.getImages().get(0).getImageData())
-                    : null;
+            String thumbnailImageUrl = cafe.getImages().isEmpty() ? null
+                    : cafe.getImages().get(0).getImageUrl();
 
             return new CafeHomeDTO(
                     cafe.getCafeId(),
@@ -150,7 +150,7 @@ public class CafeController {
                     cafe.getDesk(),
                     cafe.getRestroom(),
                     cafe.getParking(),
-                    imageBase64
+                    thumbnailImageUrl
             );
         }).collect(Collectors.toList());
 

@@ -23,5 +23,5 @@ public class CafeHomeDTO {
     private CafeAttributes.RestroomAvailability restroom;
     private CafeAttributes.ParkingAvailability parking;
 
-    private String thumbnailImageBase64;  // 대표 이미지 1장
+    private String thumbnailImageUrl;  // 대표 이미지 1장
 }

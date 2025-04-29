@@ -227,10 +227,9 @@ public class CafeService {
         if (imageUrls != null) {
             imageUrls.stream().limit(5).forEach(url -> {
                 System.out.println("📸 이미지 URL 확인: " + url);
-                byte[] imageData = fetchImageAsBytes(url);
-                System.out.println("📏 이미지 크기: " + imageData.length + " 바이트");
+                String imageUrl = uploadImageToS3FromUrl(url);
                 CafeImage image = CafeImage.builder()
-                        .imageData(imageData)
+                        .imageUrl(imageUrl)
                         .cafe(cafe)
                         .build();
                 cafe.getImages().add(image);
