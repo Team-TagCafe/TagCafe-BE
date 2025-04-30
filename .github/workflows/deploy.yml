@@ -2,8 +2,6 @@ name: Deploy to EC2 with Docker
 
 on:
   push:
-    branches: [main, fix/#25-회원로직버그]
-  pull_request:
     branches: [main]
 
 jobs:

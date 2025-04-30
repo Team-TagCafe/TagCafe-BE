@@ -138,9 +138,9 @@ public class ReportedCafeController {
         if (photoUrlsRequest != null && photoUrlsRequest.getPhotoUrls() != null) {
             List<CafeImage> images = photoUrlsRequest.getPhotoUrls().stream().limit(5)
                     .map(url -> {
-                        byte[] imageData = cafeService.fetchImageAsBytes(url);
+                        String s3Url = cafeService.uploadImageToS3FromUrl(url);
                         return CafeImage.builder()
-                                .imageData(imageData)
+                                .imageUrl(s3Url)
                                 .cafe(cafe)
                                 .build();
                     }).collect(Collectors.toList());

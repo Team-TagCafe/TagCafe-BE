@@ -4,7 +4,10 @@ import com.Minjin.TagCafe.entity.Cafe;
 import com.Minjin.TagCafe.entity.CafeImage;
 import com.Minjin.TagCafe.repository.CafeImageRepository;
 import com.Minjin.TagCafe.repository.CafeRepository;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.Minjin.TagCafe.dto.CafeDto;
 import com.Minjin.TagCafe.entity.Review;
@@ -19,6 +22,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -28,6 +32,10 @@ public class CafeService {
     private final CafeRepository cafeRepository;
     private final ReviewRepository reviewRepository;
     private final CafeImageRepository cafeImageRepository;
+    private final AmazonS3Client amazonS3Client;
+
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucket;
 
     // ID로 카페 조회
     public Cafe getCafeById(Long cafeId) {
@@ -219,10 +227,9 @@ public class CafeService {
         if (imageUrls != null) {
             imageUrls.stream().limit(5).forEach(url -> {
                 System.out.println("📸 이미지 URL 확인: " + url);
-                byte[] imageData = fetchImageAsBytes(url);
-                System.out.println("📏 이미지 크기: " + imageData.length + " 바이트");
+                String imageUrl = uploadImageToS3FromUrl(url);
                 CafeImage image = CafeImage.builder()
-                        .imageData(imageData)
+                        .imageUrl(imageUrl)
                         .cafe(cafe)
                         .build();
                 cafe.getImages().add(image);
@@ -236,30 +243,29 @@ public class CafeService {
         return cafeRepository.findAll();
     }
 
-    public byte[] fetchImageAsBytes(String imageUrl) {
-        if (imageUrl == null || imageUrl.contains("undefined")) {
-            throw new RuntimeException("잘못된 이미지 URL: " + imageUrl);
-        }
-
+    // 구글 사진 URL -> S3 업로드 메서드
+    public String uploadImageToS3FromUrl(String imageUrl){
         try {
             URL url = new URL(imageUrl);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestProperty("User-Agent", "Mozilla/5.0"); // ✅ 요게 핵심!
+            InputStream inputStream = url.openStream();
+            String fileName = "cafe-images/" + UUID.randomUUID() + ".jpg";
 
-            try (InputStream in = conn.getInputStream();
-                 ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-                byte[] buffer = new byte[1024];
-                int n;
-                while ((n = in.read(buffer)) != -1) {
-                    out.write(buffer, 0, n);
-                }
-                return out.toByteArray();
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("이미지 다운로드 실패: " + imageUrl, e);
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentType("image/jpeg");
+
+            amazonS3Client.putObject(
+                    bucket,
+                    fileName,
+                    inputStream,
+                    metadata
+            );
+            return "https://" + bucket + ".s3.ap-northeast-2.amazonaws.com/" + fileName;
+
+        } catch (IOException e){
+            e.printStackTrace();
+            throw new RuntimeException("구글 이미지 다운로드 또는 S3 업로드 실패", e);
         }
     }
-
 
 
 }
