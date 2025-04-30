@@ -70,7 +70,7 @@ public class ReportedCafe {
     @Enumerated(EnumType.STRING)
     private ReportStatus status = ReportStatus.PENDING;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "cafe_id")
     private Cafe cafe;
 

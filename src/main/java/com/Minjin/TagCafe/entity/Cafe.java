@@ -66,8 +66,18 @@ public class Cafe {
     @Column
     private CafeAttributes.ParkingAvailability parking;
 
+
     @OneToMany(mappedBy = "cafe", cascade = CascadeType.ALL, orphanRemoval = true)
     private java.util.List<CafeImage> images = new ArrayList<>();
+
+    @OneToMany(mappedBy = "cafe", cascade = CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<ReportedCafe> reportedCafes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "cafe", cascade = CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<SavedCafe> savedCafes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "cafe", cascade = CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<Review> reviews = new ArrayList<>();
 
 
     public Cafe(Long kakaoPlaceId, String cafeName, double latitude, double longitude, String address, String phoneNumber, String websiteUrl) {

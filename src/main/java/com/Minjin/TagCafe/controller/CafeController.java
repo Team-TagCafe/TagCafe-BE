@@ -162,6 +162,7 @@ public class CafeController {
     }
 
 
+    //관리자페이지 (카페등록, 카페 삭제)
     // admin - 카페 검색 후 db 저장
     @Operation(summary = "admin - 카페 저장", description = "관리자가 카페 정보를 저장합니다.")
     @PostMapping
@@ -186,6 +187,22 @@ public class CafeController {
 
         Cafe updatedCafe = cafeRepository.save(cafe);
         return ResponseEntity.ok(updatedCafe);
+    }
+
+    @Operation(summary = "admin - 카페 삭제", description = "카페 ID를 기준으로 카페와 관련된 모든 정보를 삭제합니다.")
+    @DeleteMapping("/admin/delete-cafe/{cafeId}")
+    public ResponseEntity<String> deleteCafe(@PathVariable("cafeId") Long cafeId) {
+        Cafe cafe = cafeRepository.findById(cafeId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 카페가 존재하지 않습니다."));
+        cafeRepository.delete(cafe);
+        return ResponseEntity.ok("카페가 삭제되었습니다.");
+    }
+
+    @Operation(summary = "admin - 삭제 가능한 카페 목록 조회", description = "삭제할 수 있는 카페들의 전체 목록을 반환합니다.")
+    @GetMapping("/admin/delete-cafe")
+    public ResponseEntity<List<Cafe>> getCafesForDeletion() {
+        List<Cafe> cafes = cafeRepository.findAll();
+        return ResponseEntity.ok(cafes);
     }
 
     // 모든 카페 조회 API 추가
@@ -220,4 +237,3 @@ public class CafeController {
     }
 
 }
-
