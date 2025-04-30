@@ -2,7 +2,7 @@ name: Deploy to EC2 with Docker
 
 on:
   push:
-    branches: [main]
+    branches: [main, feat/#29-카페삭제관리자페이지]
 
 jobs:
   deploy:
