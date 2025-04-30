@@ -200,9 +200,38 @@ public class CafeController {
 
     @Operation(summary = "admin - 삭제 가능한 카페 목록 조회", description = "삭제할 수 있는 카페들의 전체 목록을 반환합니다.")
     @GetMapping("/admin/delete-cafe")
-    public ResponseEntity<List<Cafe>> getCafesForDeletion() {
+    public ResponseEntity<List<CafeDto>> getCafesForDeletion() {
         List<Cafe> cafes = cafeRepository.findAll();
-        return ResponseEntity.ok(cafes);
+
+        List<CafeDto> dtos = cafes.stream().map(cafe -> {
+            List<String> imageUrls = cafe.getImages().stream()
+                    .map(CafeImage::getImageUrl)
+                    .toList();
+
+
+            return new CafeDto(
+                    cafe.getCafeId(),
+                    cafe.getKakaoPlaceId(),
+                    cafe.getCafeName(),
+                    cafe.getLatitude(),
+                    cafe.getLongitude(),
+                    cafe.getAddress(),
+                    cafe.getPhoneNumber(),
+                    cafe.getWebsiteUrl(),
+                    cafe.getUpdateAt(),
+                    cafe.getAverageRating(),
+                    cafe.getOpeningHours(),
+                    cafe.getWifi(),
+                    cafe.getOutlets(),
+                    cafe.getDesk(),
+                    cafe.getRestroom(),
+                    cafe.getParking(),
+                    null,
+                    imageUrls
+            );
+        }).toList();
+
+        return ResponseEntity.ok(dtos);
     }
 
     // 모든 카페 조회 API 추가
