@@ -8,6 +8,8 @@ import com.Minjin.TagCafe.repository.ReviewRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -186,6 +188,15 @@ public class ReviewService {
                     .collect(Collectors.toList());
         }
 
+        // 🔹 운영시간 필터 분리
+        int timeIndex = tagNames.indexOf("운영시간");
+        String timeFilterValue = null;
+        if (timeIndex != -1) {
+            timeFilterValue = values.get(timeIndex);
+            tagNames.remove(timeIndex);
+            values.remove(timeIndex);
+        }
+
         // 🔹 카페 옵션(와이파이, 콘센트 등) 필터 적용
         for (int i = 0; i < tagNames.size(); i++) {
             String tagName = tagNames.get(i);
@@ -194,6 +205,23 @@ public class ReviewService {
             final String filterValue = value;
             reviews = reviews.stream()
                     .filter(review -> reviewMatchesTag(review, tagName, filterValue))
+                    .collect(Collectors.toList());
+        }
+
+        // 🔹 운영시간 필터 처리
+        if (timeFilterValue != null) {
+            final String timeValue = timeFilterValue;
+            reviews = reviews.stream()
+                    .filter(review -> {
+                        Cafe cafe = review.getCafe();
+                        if (cafe == null || cafe.getOpeningHours() == null) return false;
+                        if ("영업중".equals(timeValue)) {
+                            return isOpenNow(cafe.getOpeningHours());
+                        } else if ("24시간".equals(timeValue)) {
+                            return cafe.getOpeningHours().contains("24시간 영업");
+                        }
+                        return true;
+                    })
                     .collect(Collectors.toList());
         }
 
@@ -229,4 +257,61 @@ public class ReviewService {
             default -> rawValue;
         };
     }
+    // 운영시간 필터 관련 메서드 (CafeService와 동일)
+    private boolean isOpenNow(String openingHours) {
+        if (openingHours == null || openingHours.isEmpty() || openingHours.equals("정보 없음")) {
+            return false;
+        }
+
+        String[] lines = openingHours.split(", ");
+        LocalDateTime now = LocalDateTime.now();
+        String todayKor = switch (now.getDayOfWeek()) {
+            case MONDAY -> "월요일";
+            case TUESDAY -> "화요일";
+            case WEDNESDAY -> "수요일";
+            case THURSDAY -> "목요일";
+            case FRIDAY -> "금요일";
+            case SATURDAY -> "토요일";
+            case SUNDAY -> "일요일";
+        };
+
+        for (String line : lines) {
+            if (!line.startsWith(todayKor)) continue;
+
+            if (line.contains("휴무일")) {
+                return false;
+            }
+
+            if (line.contains("24시간 영업")) {
+                return true;
+            }
+
+            String[] parts = line.split(": ");
+            if (parts.length < 2) return false;
+
+            String[] times = parts[1].split(" ~ ");
+            if (times.length < 2) return false;
+
+            LocalTime start = parseKoreanTime(times[0]);
+            LocalTime end = parseKoreanTime(times[1]);
+            LocalTime nowTime = now.toLocalTime();
+
+            return nowTime.isAfter(start) && nowTime.isBefore(end);
+        }
+        return false;
+    }
+
+    private java.time.LocalTime parseKoreanTime(String timeStr) {
+        boolean isPM = timeStr.contains("오후");
+        timeStr = timeStr.replace("오전", "").replace("오후", "").trim();
+        String[] parts = timeStr.split(":");
+        int hour = Integer.parseInt(parts[0].trim());
+        int minute = Integer.parseInt(parts[1].trim());
+
+        if (isPM && hour != 12) hour += 12;
+        if (!isPM && hour == 12) hour = 0;
+
+        return java.time.LocalTime.of(hour, minute);
+    }
+
 }
